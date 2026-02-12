@@ -1,8 +1,8 @@
-const { config } = require('dotenv');
+import { config } from 'dotenv';
 
 let hasLoadedLocalEnv = false;
 
-function loadLocalApiEnv() {
+export function loadLocalApiEnv(): void {
   if (hasLoadedLocalEnv) {
     return;
   }
@@ -13,7 +13,3 @@ function loadLocalApiEnv() {
   config({ path: '.env.local', override: false, quiet: true });
   config({ path: '.env', override: false, quiet: true });
 }
-
-module.exports = {
-  loadLocalApiEnv
-};

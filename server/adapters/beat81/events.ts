@@ -1,18 +1,69 @@
+import type { Beat81Event, Beat81EventsPayload } from '../../types';
+
 const DEFAULT_BEAT81_API_BASE_URL = 'https://api.production.b81.io';
 const DEFAULT_LANGUAGE = 'de';
 const DEFAULT_LIMIT = 10;
 const DEFAULT_SKIP = 0;
 const DEFAULT_LOCATION_ID = 'b5d7aae0-cec0-45bd-a79f-a312635078c1';
 
-function resolveApiBaseUrl() {
+interface Beat81ApiImageVariant {
+  url?: string;
+}
+
+interface Beat81ApiProfilePicture {
+  small?: Beat81ApiImageVariant;
+  medium?: Beat81ApiImageVariant;
+  large?: Beat81ApiImageVariant;
+  thumb?: Beat81ApiImageVariant;
+}
+
+interface Beat81ApiCoach {
+  forename?: string;
+  surname?: string;
+  profile_picture?: Beat81ApiProfilePicture;
+}
+
+interface Beat81ApiType {
+  name?: string;
+}
+
+interface Beat81ApiLocation {
+  name?: string;
+}
+
+interface Beat81ApiEvent {
+  id?: string | number;
+  date_begin?: string;
+  max_participants?: number;
+  current_participants_count?: number;
+  participants_count?: number;
+  type?: Beat81ApiType;
+  location?: Beat81ApiLocation;
+  coach?: Beat81ApiCoach;
+}
+
+interface Beat81ApiEventsResponse {
+  data?: Beat81ApiEvent[];
+  total?: number;
+}
+
+interface Beat81EventsOptions {
+  dateBeginGte?: string;
+  language?: string;
+  limit?: number;
+  skip?: number;
+  locationId?: string;
+}
+
+function resolveApiBaseUrl(): string {
   return process.env['BEAT81_API_BASE_URL']?.trim() || DEFAULT_BEAT81_API_BASE_URL;
 }
 
-function resolveLanguage(language) {
+function resolveLanguage(language: string | undefined): string {
   return language || process.env['BEAT81_ACCEPT_LANGUAGE']?.trim() || DEFAULT_LANGUAGE;
 }
 
-function resolveLimit(limit) {
+function resolveLimit(limit: number | undefined): number {
   if (typeof limit === 'number' && Number.isInteger(limit) && limit > 0) {
     return limit;
   }
@@ -21,7 +72,7 @@ function resolveLimit(limit) {
   return Number.isInteger(envLimit) && envLimit > 0 ? envLimit : DEFAULT_LIMIT;
 }
 
-function resolveSkip(skip) {
+function resolveSkip(skip: number | undefined): number {
   if (typeof skip === 'number' && Number.isInteger(skip) && skip >= 0) {
     return skip;
   }
@@ -30,20 +81,20 @@ function resolveSkip(skip) {
   return Number.isInteger(envSkip) && envSkip >= 0 ? envSkip : DEFAULT_SKIP;
 }
 
-function resolveLocationId(locationId) {
+function resolveLocationId(locationId: string | undefined): string | undefined {
   return locationId || process.env['BEAT81_LOCATION_ID']?.trim() || DEFAULT_LOCATION_ID;
 }
 
-function resolveDateBeginGte(dateBeginGte) {
+function resolveDateBeginGte(dateBeginGte: string | undefined): string {
   return dateBeginGte || process.env['BEAT81_DATE_BEGIN_GTE']?.trim() || new Date().toISOString();
 }
 
-function resolveToken() {
+function resolveToken(): string | undefined {
   const token = process.env['BEAT81_TOKEN']?.trim();
   return token ? token : undefined;
 }
 
-function buildTrainerName(coach) {
+function buildTrainerName(coach: Beat81ApiCoach | undefined): string | null {
   if (!coach) {
     return null;
   }
@@ -54,7 +105,7 @@ function buildTrainerName(coach) {
   return fullName || null;
 }
 
-function extractTrainerImageUrl(coach) {
+function extractTrainerImageUrl(coach: Beat81ApiCoach | undefined): string | null {
   const profilePicture = coach?.profile_picture;
   return (
     profilePicture?.small?.url ||
@@ -65,15 +116,15 @@ function extractTrainerImageUrl(coach) {
   );
 }
 
-function normalizeEvents(payload) {
-  const response = payload;
+function normalizeEvents(payload: unknown): { items: Beat81Event[]; sourceTotal: number | null } {
+  const response = payload as Beat81ApiEventsResponse;
   const rawItems = Array.isArray(response.data)
     ? response.data
     : Array.isArray(payload)
-      ? payload
+      ? (payload as Beat81ApiEvent[])
       : [];
 
-  const items = rawItems.map((item, index) => ({
+  const items: Beat81Event[] = rawItems.map((item, index) => ({
     id: String(item.id ?? `idx-${index}`),
     title: item.type?.name?.trim() || 'Workout',
     startsAt: item.date_begin || '',
@@ -89,7 +140,11 @@ function normalizeEvents(payload) {
   };
 }
 
-function extractCapacityFields(item) {
+function extractCapacityFields(item: Beat81ApiEvent): {
+  maxParticipants: number | null;
+  currentParticipants: number | null;
+  openSpots: number | null;
+} {
   const maxParticipants =
     typeof item.max_participants === 'number' ? item.max_participants : null;
   const currentParticipants =
@@ -114,7 +169,7 @@ function extractCapacityFields(item) {
   };
 }
 
-async function fetchBeat81Events(options = {}) {
+export async function fetchBeat81Events(options: Beat81EventsOptions = {}): Promise<Beat81EventsPayload> {
   const url = new URL('/api/events', resolveApiBaseUrl());
   url.searchParams.set('date_begin_gte', resolveDateBeginGte(options.dateBeginGte));
   url.searchParams.set('$sort[date_begin]', '1');
@@ -130,7 +185,7 @@ async function fetchBeat81Events(options = {}) {
   }
 
   const token = resolveToken();
-  const headers = {
+  const headers: Record<string, string> = {
     accept: 'application/json, text/plain, */*',
     'accept-language': resolveLanguage(options.language)
   };
@@ -144,7 +199,7 @@ async function fetchBeat81Events(options = {}) {
     throw new Error(`Beat81 events request failed (${response.status}): ${errorText.slice(0, 200)}`);
   }
 
-  const normalized = normalizeEvents(await response.json());
+  const normalized = normalizeEvents((await response.json()) as unknown);
   return {
     items: normalized.items,
     count: normalized.items.length,
@@ -152,7 +207,3 @@ async function fetchBeat81Events(options = {}) {
     fetchedAt: new Date().toISOString()
   };
 }
-
-module.exports = {
-  fetchBeat81Events
-};

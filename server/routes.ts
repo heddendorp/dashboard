@@ -1,12 +1,20 @@
-const { fetchBeat81Events } = require('./adapters/beat81/events');
-const { fetchBeat81EventTypes } = require('./adapters/beat81/event-types');
-const { fetchGoogleCalendarEvents } = require('./adapters/calendar/google-calendar');
+import { fetchBeat81Events } from './adapters/beat81/events';
+import { fetchBeat81EventTypes } from './adapters/beat81/event-types';
+import { fetchGoogleCalendarEvents } from './adapters/calendar/google-calendar';
+import type {
+  ApiRequest,
+  ApiResponse,
+  Beat81EventsPayload,
+  Beat81EventTypesPayload,
+  DashboardPayload,
+  HealthPayload
+} from './types';
 
-function getErrorMessage(error) {
+function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Unexpected adapter error.';
 }
 
-function createBaseDashboardPayload() {
+function createBaseDashboardPayload(): DashboardPayload {
   const generatedAt = new Date().toISOString();
 
   return {
@@ -42,7 +50,7 @@ function createBaseDashboardPayload() {
   };
 }
 
-async function createDashboardPayload() {
+async function createDashboardPayload(): Promise<DashboardPayload> {
   const payload = createBaseDashboardPayload();
 
   try {
@@ -102,7 +110,7 @@ async function createDashboardPayload() {
   return payload;
 }
 
-function createHealthPayload() {
+function createHealthPayload(): HealthPayload {
   return {
     status: 'ok',
     service: 'dashboard-bff',
@@ -110,14 +118,14 @@ function createHealthPayload() {
   };
 }
 
-function respondNotImplemented(res) {
+function respondNotImplemented(res: ApiResponse): void {
   res.status(501).json({
     error: 'not_implemented',
     message: 'Shopping write APIs are part of Stage 3 data management.'
   });
 }
 
-function readStringQueryParam(req, key) {
+function readStringQueryParam(req: ApiRequest, key: string): string | undefined {
   const value = req.query?.[key];
 
   if (Array.isArray(value)) {
@@ -127,7 +135,7 @@ function readStringQueryParam(req, key) {
   return typeof value === 'string' ? value : undefined;
 }
 
-function readFirstQueryParam(req, keys) {
+function readFirstQueryParam(req: ApiRequest, keys: string[]): string | undefined {
   for (const key of keys) {
     const value = readStringQueryParam(req, key);
     if (value) {
@@ -138,19 +146,19 @@ function readFirstQueryParam(req, keys) {
   return undefined;
 }
 
-function readLimit(req) {
+function readLimit(req: ApiRequest): number | undefined {
   const parsed = Number.parseInt(readFirstQueryParam(req, ['limit', '$limit']) ?? '', 10);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
-function readNonNegativeInt(req, key) {
+function readNonNegativeInt(req: ApiRequest, key: string): number | undefined {
   const parsed = Number.parseInt(readStringQueryParam(req, key) ?? '', 10);
   return Number.isInteger(parsed) && parsed >= 0 ? parsed : undefined;
 }
 
-async function respondBeat81EventTypes(req, res) {
+async function respondBeat81EventTypes(req: ApiRequest, res: ApiResponse): Promise<void> {
   try {
-    const payload = await fetchBeat81EventTypes({
+    const payload: Beat81EventTypesPayload = await fetchBeat81EventTypes({
       limit: readLimit(req),
       language: readStringQueryParam(req, 'language')
     });
@@ -163,9 +171,9 @@ async function respondBeat81EventTypes(req, res) {
   }
 }
 
-async function respondBeat81Events(req, res) {
+async function respondBeat81Events(req: ApiRequest, res: ApiResponse): Promise<void> {
   try {
-    const payload = await fetchBeat81Events({
+    const payload: Beat81EventsPayload = await fetchBeat81Events({
       dateBeginGte: readFirstQueryParam(req, ['dateBeginGte', 'date_begin_gte']),
       language: readFirstQueryParam(req, ['language']),
       limit: readLimit(req),
@@ -184,21 +192,7 @@ async function respondBeat81Events(req, res) {
   }
 }
 
-async function respondCalendarEvents(req, res) {
-  try {
-    const payload = await fetchGoogleCalendarEvents({
-      maxResults: readLimit(req)
-    });
-    res.status(200).json(payload);
-  } catch (error) {
-    res.status(502).json({
-      error: 'calendar_unavailable',
-      message: getErrorMessage(error)
-    });
-  }
-}
-
-async function handleRoute(req, res, route) {
+export async function handleRoute(req: ApiRequest, res: ApiResponse, route: string[]): Promise<void> {
   const method = (req.method ?? 'GET').toUpperCase();
   const [resource] = route;
 
@@ -223,11 +217,6 @@ async function handleRoute(req, res, route) {
     return;
   }
 
-  if (resource === 'calendar' && route[1] === 'events' && method === 'GET') {
-    await respondCalendarEvents(req, res);
-    return;
-  }
-
   if (resource === 'shopping' && method === 'GET') {
     res.status(200).json({ items: [] });
     return;
@@ -243,7 +232,3 @@ async function handleRoute(req, res, route) {
     message: `Route not found: ${method} /api/${route.join('/')}`
   });
 }
-
-module.exports = {
-  handleRoute
-};

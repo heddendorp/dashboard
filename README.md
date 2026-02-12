@@ -36,16 +36,17 @@ src/app/
       state/
       assets/
 api/
-  health.js
-  dashboard.js
-  beat81/events.js
-  beat81/event-types.js
-  shopping/index.js
-  shopping/[id].js
+  health.ts
+  dashboard.ts
+  beat81/events.ts
+  beat81/event-types.ts
+  shopping/index.ts
+  shopping/[id].ts
 server/
-  auth.js
-  with-auth.js
-  routes.js
+  auth.ts
+  with-auth.ts
+  routes.ts
+  types.ts
   adapters/
 docs/
   implementation-plan.md
@@ -161,7 +162,7 @@ To reduce merge conflicts in parallel work:
 - `src/app/features/frog/**` is Stage 2 owned.
 - `src/app/features/data/**` is Stage 3 owned.
 - `server/adapters/**` is Stage 3 owned.
-- Shared files (`src/app/app.ts`, `src/app/app.html`, `server/routes.js`) should only receive narrow, explicit contract changes.
+- Shared files (`src/app/app.ts`, `src/app/app.html`, `server/types.ts`, `server/routes.ts`) should only receive narrow, explicit contract changes.
 
 ## Parallel Branch Workflow
 Baseline branch:

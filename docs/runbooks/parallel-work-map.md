@@ -10,12 +10,13 @@
 ## Conflict Avoidance Rules
 1. Stage 2 edits only Frog-owned paths.
 2. Stage 3 edits only Data/API-owned paths.
-3. Shared files (`src/app/app.ts`, `src/app/app.html`, `server/routes.js`) require narrow changes and small PRs.
+3. Shared files (`src/app/app.ts`, `src/app/app.html`, `api/types.ts`) require narrow changes and small PRs.
 4. If a shared contract changes, update runbooks in the same PR.
 
 ## Shared Contract Files
 - `src/app/core/dashboard.models.ts`
-- `server/routes.js`
+- `api/types.ts`
+- `api/routes.ts`
 
 ## Merge Strategy
 1. Merge smallest contract-only PRs first.

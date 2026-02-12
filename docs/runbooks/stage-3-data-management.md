@@ -8,15 +8,16 @@ Branch: `codex/stage3-data`
 - Keep frog feature files untouched unless a shared type is required.
 
 ## File Ownership
-- `server/adapters/calendar/`
-- `server/adapters/shopping/`
-- `server/adapters/beat81/`
+- `api/adapters/calendar/`
+- `api/adapters/shopping/`
+- `api/adapters/beat81/`
 - `api/contracts/`
-- `api/health.js`
-- `api/dashboard.js`
+- `api/health.ts`
+- `api/dashboard.ts`
 - `api/beat81/`
 - `api/shopping/`
-- `server/routes.js`
+- `api/routes.ts`
+- `api/types.ts`
 - `src/app/features/data/components/`
 - `src/app/features/data/models/`
 - `src/app/features/data/services/`

@@ -1,0 +1,22 @@
+<section class="widgets" aria-label="Core widgets">
+  @for (widget of widgets(); track widget.id) {
+    <article class="widget-card" [attr.aria-labelledby]="widget.id + '-title'">
+      <p class="widget-label">{{ widget.id }}</p>
+      <h2 [id]="widget.id + '-title'">{{ widget.title }}</h2>
+      <p>{{ widget.description }}</p>
+      <p class="next-step">{{ widget.nextStep }}</p>
+    </article>
+  }
+
+  <section class="status-card" aria-labelledby="status-title">
+    <h2 id="status-title">System Status</h2>
+    <ul>
+      @for (row of statusRows(); track row.label) {
+        <li>
+          <span>{{ row.label }}</span>
+          <strong>{{ row.value }}</strong>
+        </li>
+      }
+    </ul>
+  </section>
+</section>

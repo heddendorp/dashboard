@@ -30,7 +30,7 @@
   color: var(--accent-ink);
 }
 
-h1 {
+.top-bar h1 {
   margin: 0.2rem 0;
   font-size: clamp(1.4rem, 2vw, 2rem);
   color: var(--ink-strong);
@@ -59,101 +59,8 @@ h1 {
   flex: 1;
 }
 
-.widgets {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.widget-card,
-.status-card,
-.frog-panel {
-  border-radius: 1rem;
-  border: 1px solid var(--panel-stroke);
-  background: var(--panel-bg);
-  padding: 1rem;
-}
-
-.widget-label {
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.7rem;
-  color: var(--accent-ink);
-}
-
-h2 {
-  margin: 0.3rem 0 0.5rem;
-  color: var(--ink-strong);
-}
-
-p {
-  margin: 0;
-  color: var(--ink);
-}
-
-.next-step {
-  margin-top: 0.65rem;
-  font-size: 0.9rem;
-  color: var(--ink-muted);
-}
-
-.status-card ul {
-  margin: 0.75rem 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 0.5rem;
-}
-
-.status-card li {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.8rem;
-  border-bottom: 1px solid rgb(83 96 130 / 0.16);
-  padding-bottom: 0.4rem;
-}
-
-.status-card strong {
-  color: var(--ink-strong);
-}
-
-.frog-column {
-  min-height: 0;
-}
-
-.frog-panel {
-  min-height: 100%;
-  background: linear-gradient(180deg, rgb(232 247 236 / 0.95), rgb(216 240 223 / 0.95));
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-
-button {
-  margin-top: auto;
-  border-radius: 0.7rem;
-  border: 1px solid rgb(77 103 80 / 0.4);
-  background: rgb(255 255 255 / 0.8);
-  color: rgb(64 87 66);
-  padding: 0.65rem 0.75rem;
-  font: inherit;
-}
-
-button:disabled {
-  opacity: 1;
-}
-
 @media (max-width: 1050px) {
   .board {
     grid-template-columns: 1fr;
-  }
-
-  .widgets {
-    grid-template-columns: 1fr;
-  }
-
-  .frog-panel {
-    min-height: 240px;
   }
 }

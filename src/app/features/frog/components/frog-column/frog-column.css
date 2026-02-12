@@ -1,0 +1,53 @@
+:host.frog-column {
+  display: block;
+  min-height: 0;
+}
+
+.frog-panel {
+  border-radius: 1rem;
+  border: 1px solid var(--panel-stroke);
+  min-height: 100%;
+  background: linear-gradient(180deg, rgb(232 247 236 / 0.95), rgb(216 240 223 / 0.95));
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1rem;
+}
+
+.widget-label {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+  color: var(--accent-ink);
+}
+
+h2 {
+  margin: 0.3rem 0 0.5rem;
+  color: var(--ink-strong);
+}
+
+p {
+  margin: 0;
+  color: var(--ink);
+}
+
+button {
+  margin-top: auto;
+  border-radius: 0.7rem;
+  border: 1px solid rgb(77 103 80 / 0.4);
+  background: rgb(255 255 255 / 0.8);
+  color: rgb(64 87 66);
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+}
+
+button:disabled {
+  opacity: 1;
+}
+
+@media (max-width: 1050px) {
+  .frog-panel {
+    min-height: 240px;
+  }
+}

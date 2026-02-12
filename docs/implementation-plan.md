@@ -9,6 +9,11 @@ Architecture baseline:
 - Basic auth/passcode gate for API access
 - Vercel-managed KV (Upstash via Marketplace) in later stage
 
+Related planning files:
+- `docs/runbooks/stage-2-frog.md`
+- `docs/runbooks/stage-3-data-management.md`
+- `docs/runbooks/parallel-work-map.md`
+
 ## Stage 1: Absolute Basics
 
 ### Goal
@@ -37,6 +42,10 @@ Implement interactive frog panel from provided SVG sprite assets.
 - Touch-first interactions (tap required, hover optional).
 - Accessibility-safe interactions and reduced-motion handling.
 
+### Primary ownership
+- `src/app/features/frog/`
+- `public/frog/`
+
 ### Verification
 - Tap interactions trigger predictable frog states.
 - Frog panel failures do not break other widgets.
@@ -51,6 +60,11 @@ Implement real data pipelines and persistence.
 - Beat81 private adapter from recorded browser requests.
 - Shopping list persistence in Vercel-managed KV.
 - Widget health, cache TTL, and graceful degradation.
+
+### Primary ownership
+- `src/app/features/data/`
+- `api/adapters/`
+- `api/contracts/`
 
 ### Verification
 - Calendar/Beat81 failures degrade only affected widgets.

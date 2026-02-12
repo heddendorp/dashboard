@@ -9,39 +9,7 @@
   </header>
 
   <div class="board">
-    <section class="widgets" aria-label="Core widgets">
-      @for (widget of widgets(); track widget.id) {
-        <article class="widget-card" [attr.aria-labelledby]="widget.id + '-title'">
-          <p class="widget-label">{{ widget.id }}</p>
-          <h2 [id]="widget.id + '-title'">{{ widget.title }}</h2>
-          <p>{{ widget.description }}</p>
-          <p class="next-step">{{ widget.nextStep }}</p>
-        </article>
-      }
-
-      <section class="status-card" aria-labelledby="status-title">
-        <h2 id="status-title">System Status</h2>
-        <ul>
-          @for (row of statusRows(); track row.label) {
-            <li>
-              <span>{{ row.label }}</span>
-              <strong>{{ row.value }}</strong>
-            </li>
-          }
-        </ul>
-      </section>
-    </section>
-
-    <aside class="frog-column" aria-labelledby="frog-title">
-      <div class="frog-panel">
-        <p class="widget-label">frog area</p>
-        <h2 id="frog-title">Interactive Frog Reserved</h2>
-        <p>
-          This panel is fixed to the right third so Stage 2 can add sprite states and touch interactions
-          without changing the main layout.
-        </p>
-        <button type="button" disabled aria-disabled="true">Frog interactions start in Stage 2</button>
-      </div>
-    </aside>
+    <app-data-column />
+    <app-frog-column />
   </div>
 </main>

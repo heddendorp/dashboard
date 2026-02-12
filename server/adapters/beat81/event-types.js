@@ -1,35 +1,16 @@
-import type { Beat81EventType, Beat81EventTypesPayload } from '../../types';
-
 const DEFAULT_BEAT81_API_BASE_URL = 'https://api.production.b81.io';
 const DEFAULT_LANGUAGE = 'de';
 const DEFAULT_LIMIT = 50;
 
-interface Beat81ApiEventType {
-  _id?: string | number;
-  id?: string | number;
-  name?: string;
-}
-
-interface Beat81ApiResponse {
-  data?: Beat81ApiEventType[];
-  total?: number;
-}
-
-interface Beat81EventTypesOptions {
-  isPublished?: boolean;
-  language?: string;
-  limit?: number;
-}
-
-function resolveApiBaseUrl(): string {
+function resolveApiBaseUrl() {
   return process.env['BEAT81_API_BASE_URL']?.trim() || DEFAULT_BEAT81_API_BASE_URL;
 }
 
-function resolveLanguage(language: string | undefined): string {
+function resolveLanguage(language) {
   return language || process.env['BEAT81_ACCEPT_LANGUAGE']?.trim() || DEFAULT_LANGUAGE;
 }
 
-function resolveLimit(limit: number | undefined): number {
+function resolveLimit(limit) {
   if (typeof limit === 'number' && Number.isInteger(limit) && limit > 0) {
     return limit;
   }
@@ -38,21 +19,21 @@ function resolveLimit(limit: number | undefined): number {
   return Number.isInteger(envLimit) && envLimit > 0 ? envLimit : DEFAULT_LIMIT;
 }
 
-function normalizeEventTypes(payload: unknown): { items: Beat81EventType[]; sourceTotal: number | null } {
-  const response = payload as Beat81ApiResponse;
+function normalizeEventTypes(payload) {
+  const response = payload;
   const rawItems = Array.isArray(response.data)
     ? response.data
     : Array.isArray(payload)
-      ? (payload as Beat81ApiEventType[])
+      ? payload
       : [];
 
-  const items: Beat81EventType[] = rawItems
+  const items = rawItems
     .filter((item) => typeof item?.name === 'string')
     .map((item, index) => {
       const rawId = item._id ?? item.id ?? `idx-${index}`;
       return {
         id: String(rawId),
-        name: item.name as string
+        name: item.name
       };
     });
 
@@ -62,9 +43,7 @@ function normalizeEventTypes(payload: unknown): { items: Beat81EventType[]; sour
   };
 }
 
-export async function fetchBeat81EventTypes(
-  options: Beat81EventTypesOptions = {}
-): Promise<Beat81EventTypesPayload> {
+async function fetchBeat81EventTypes(options = {}) {
   const url = new URL('/api/event-types', resolveApiBaseUrl());
   url.searchParams.set('$sort[name]', '1');
   url.searchParams.set('is_published', String(options.isPublished ?? true));
@@ -83,7 +62,7 @@ export async function fetchBeat81EventTypes(
     throw new Error(`Beat81 request failed (${response.status}): ${errorText.slice(0, 200)}`);
   }
 
-  const normalized = normalizeEventTypes((await response.json()) as unknown);
+  const normalized = normalizeEventTypes(await response.json());
 
   return {
     items: normalized.items,
@@ -92,3 +71,7 @@ export async function fetchBeat81EventTypes(
     fetchedAt: new Date().toISOString()
   };
 }
+
+module.exports = {
+  fetchBeat81EventTypes
+};

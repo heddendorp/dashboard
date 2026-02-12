@@ -1,22 +1,9 @@
-import { google } from 'googleapis';
-
-import type { CalendarEvent } from '../../types';
+const { google } = require('googleapis');
 
 const DEFAULT_MAX_RESULTS = 8;
 const DEFAULT_TIMEZONE = 'Europe/Berlin';
 
-interface GoogleServiceAccountCredentials {
-  client_email?: string;
-  private_key?: string;
-}
-
-export interface GoogleCalendarEventsResult {
-  items: CalendarEvent[];
-  count: number;
-  fetchedAt: string;
-}
-
-function resolveCalendarId(): string {
+function resolveCalendarId() {
   const calendarId = process.env['GOOGLE_CALENDAR_ID']?.trim();
   if (!calendarId) {
     throw new Error('GOOGLE_CALENDAR_ID is not configured.');
@@ -25,16 +12,20 @@ function resolveCalendarId(): string {
   return calendarId;
 }
 
-function resolveMaxResults(): number {
+function resolveMaxResults(maxResults) {
+  if (typeof maxResults === 'number' && Number.isInteger(maxResults) && maxResults > 0) {
+    return maxResults;
+  }
+
   const parsed = Number.parseInt(process.env['GOOGLE_CALENDAR_MAX_RESULTS'] ?? '', 10);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : DEFAULT_MAX_RESULTS;
 }
 
-function resolveTimeZone(): string {
+function resolveTimeZone() {
   return process.env['GOOGLE_CALENDAR_TIMEZONE']?.trim() || DEFAULT_TIMEZONE;
 }
 
-function parseServiceAccountCredentials(): GoogleServiceAccountCredentials {
+function parseServiceAccountCredentials() {
   const raw =
     process.env['GOOGLE_SERVICE_ACCOUNT_JSON']?.trim() ??
     process.env['GOOGLE_SERVICE_ACCOUNT']?.trim();
@@ -42,7 +33,7 @@ function parseServiceAccountCredentials(): GoogleServiceAccountCredentials {
     throw new Error('GOOGLE_SERVICE_ACCOUNT_JSON (or GOOGLE_SERVICE_ACCOUNT) is not configured.');
   }
 
-  const parsed = JSON.parse(raw) as GoogleServiceAccountCredentials;
+  const parsed = JSON.parse(raw);
   const clientEmail = parsed.client_email?.trim();
   const privateKey = parsed.private_key?.replace(/\\n/g, '\n');
 
@@ -56,7 +47,7 @@ function parseServiceAccountCredentials(): GoogleServiceAccountCredentials {
   };
 }
 
-function toIsoDate(value: string | undefined): string {
+function toIsoDate(value) {
   if (!value) {
     return '';
   }
@@ -65,12 +56,7 @@ function toIsoDate(value: string | undefined): string {
   return Number.isNaN(parsed.getTime()) ? value : parsed.toISOString();
 }
 
-function normalizeGoogleEvent(event: {
-  id?: string | null;
-  summary?: string | null;
-  start?: { dateTime?: string | null; date?: string | null } | null;
-  end?: { dateTime?: string | null; date?: string | null } | null;
-}): CalendarEvent | null {
+function normalizeGoogleEvent(event) {
   const startDate = event.start?.date?.trim();
   const endDate = event.end?.date?.trim();
   const isAllDay = Boolean(startDate);
@@ -94,7 +80,7 @@ function normalizeGoogleEvent(event: {
   };
 }
 
-export async function fetchGoogleCalendarEvents(): Promise<GoogleCalendarEventsResult> {
+async function fetchGoogleCalendarEvents(options = {}) {
   const credentials = parseServiceAccountCredentials();
   const auth = new google.auth.JWT({
     email: credentials.client_email,
@@ -107,7 +93,7 @@ export async function fetchGoogleCalendarEvents(): Promise<GoogleCalendarEventsR
     calendarId: resolveCalendarId(),
     singleEvents: true,
     orderBy: 'startTime',
-    maxResults: resolveMaxResults(),
+    maxResults: resolveMaxResults(options.maxResults),
     timeMin: new Date().toISOString(),
     timeZone: resolveTimeZone()
   });
@@ -122,7 +108,7 @@ export async function fetchGoogleCalendarEvents(): Promise<GoogleCalendarEventsR
         end: item.end
       })
     )
-    .filter((item): item is CalendarEvent => item !== null);
+    .filter((item) => item !== null);
 
   return {
     items,
@@ -130,3 +116,7 @@ export async function fetchGoogleCalendarEvents(): Promise<GoogleCalendarEventsR
     fetchedAt: new Date().toISOString()
   };
 }
+
+module.exports = {
+  fetchGoogleCalendarEvents
+};

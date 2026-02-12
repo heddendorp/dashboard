@@ -63,7 +63,7 @@ Implement real data pipelines and persistence.
 
 ### Primary ownership
 - `src/app/features/data/`
-- `api/adapters/`
+- `server/adapters/`
 - `api/contracts/`
 
 ### Verification

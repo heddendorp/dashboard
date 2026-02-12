@@ -1,6 +1,4 @@
-import type { ApiRequest, ApiResponse } from './types';
-
-function decodeBasicAuthorization(headerValue: string): { username: string; password: string } | null {
+function decodeBasicAuthorization(headerValue) {
   if (!headerValue.startsWith('Basic ')) {
     return null;
   }
@@ -19,12 +17,12 @@ function decodeBasicAuthorization(headerValue: string): { username: string; pass
   };
 }
 
-function isBasicAuthDisabled(): boolean {
+function isBasicAuthDisabled() {
   const value = process.env['BASIC_AUTH_DISABLED']?.trim().toLowerCase();
   return value === '1' || value === 'true' || value === 'yes';
 }
 
-export function isAuthorizedRequest(req: ApiRequest): boolean {
+function isAuthorizedRequest(req) {
   if (isBasicAuthDisabled()) {
     return true;
   }
@@ -51,10 +49,15 @@ export function isAuthorizedRequest(req: ApiRequest): boolean {
   return credentials.username === expectedUsername && credentials.password === expectedPassword;
 }
 
-export function respondUnauthorized(res: ApiResponse): void {
+function respondUnauthorized(res) {
   res.setHeader('WWW-Authenticate', 'Basic realm="hallway-dashboard"');
   res.status(401).json({
     error: 'unauthorized',
     message: 'Valid credentials are required.'
   });
 }
+
+module.exports = {
+  isAuthorizedRequest,
+  respondUnauthorized
+};

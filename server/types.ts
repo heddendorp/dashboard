@@ -59,6 +59,7 @@ export interface Beat81Event {
   title: string;
   startsAt: string;
   location: string;
+  isBooked: boolean;
   trainerName: string | null;
   trainerImageUrl: string | null;
   maxParticipants: number | null;

@@ -15,6 +15,4 @@ import { FrogColumnComponent } from './features/frog/components/frog-column/frog
 })
 export class App {
   protected readonly pageTitle = 'Hallway Dashboard';
-  protected readonly subtitle =
-    'Stage 1 baseline: shell layout, server contract, and branch-ready structure.';
 }

@@ -40,8 +40,16 @@ body {
 
 ::view-transition-old(calendar-tile),
 ::view-transition-new(calendar-tile),
+::view-transition-old(calendar-title),
+::view-transition-new(calendar-title),
+::view-transition-old(calendar-list),
+::view-transition-new(calendar-list),
 ::view-transition-old(workouts-tile),
-::view-transition-new(workouts-tile) {
+::view-transition-new(workouts-tile),
+::view-transition-old(workouts-title),
+::view-transition-new(workouts-title),
+::view-transition-old(workouts-list),
+::view-transition-new(workouts-list) {
   animation-duration: 220ms;
   animation-timing-function: ease;
 }
@@ -49,8 +57,16 @@ body {
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(calendar-tile),
   ::view-transition-new(calendar-tile),
+  ::view-transition-old(calendar-title),
+  ::view-transition-new(calendar-title),
+  ::view-transition-old(calendar-list),
+  ::view-transition-new(calendar-list),
   ::view-transition-old(workouts-tile),
-  ::view-transition-new(workouts-tile) {
+  ::view-transition-new(workouts-tile),
+  ::view-transition-old(workouts-title),
+  ::view-transition-new(workouts-title),
+  ::view-transition-old(workouts-list),
+  ::view-transition-new(workouts-list) {
     animation-duration: 1ms;
   }
 }

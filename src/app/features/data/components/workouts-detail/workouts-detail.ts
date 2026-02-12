@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 import type { DataBeat81Event } from '../../models/data-dashboard.models';
 import { DataDashboardService } from '../../services/data-dashboard.service';
 import { isBerlinAtOrAfter, isBerlinWorkday } from '../../utils/berlin-workout-filter';
+import { getWorkoutCalendarConflict } from '../../utils/workout-calendar-conflict';
 
 const AUTO_RETURN_MS = 15_000;
 const EVENING_CUTOFF_MINUTES = 18 * 60 + 30;
@@ -22,6 +23,7 @@ interface WorkoutRow {
   id: string;
   title: string;
   startsAtLabel: string;
+  isBooked: boolean;
   location: string;
   trainerName: string;
   trainerImageUrl: string | null;
@@ -29,6 +31,9 @@ interface WorkoutRow {
   openSpotsLabel: string;
   openSpotsClass: string;
   capacityLabel: string;
+  calendarConflictLabel: string | null;
+  calendarConflictClass: string | null;
+  calendarConflictHint: string | null;
 }
 
 @Component({
@@ -63,6 +68,7 @@ export class WorkoutsDetailComponent {
   private readonly isBrowser = isPlatformBrowser(this.platformId);
 
   protected readonly workoutsResource = this.dataDashboardService.beat81DetailResource;
+  protected readonly calendarEvents = this.dataDashboardService.calendarDetailEvents;
   protected readonly workdaysOnly = signal(true);
   protected readonly eveningOnly = signal(true);
   protected readonly minTwoSpotsOnly = signal(true);
@@ -70,6 +76,8 @@ export class WorkoutsDetailComponent {
   protected readonly filteredWorkouts = computed<WorkoutRow[]>(() =>
     this.dataDashboardService.beat81DetailEvents()
       .filter((event) => this.matchesFilters(event))
+      .slice()
+      .sort((left, right) => this.compareWorkouts(left, right))
       .map((event) => this.toWorkoutRow(event))
   );
 
@@ -130,6 +138,10 @@ export class WorkoutsDetailComponent {
   }
 
   private matchesFilters(event: DataBeat81Event): boolean {
+    if (event.isBooked) {
+      return true;
+    }
+
     if (this.workdaysOnly() && !isBerlinWorkday(event.startsAt)) {
       return false;
     }
@@ -148,18 +160,36 @@ export class WorkoutsDetailComponent {
   private toWorkoutRow(event: DataBeat81Event): WorkoutRow {
     const trainerName = event.trainerName || 'Trainer TBD';
     const spots = this.toOpenSpotsIndicator(event.openSpots);
+    const calendarConflict = event.isBooked
+      ? null
+      : getWorkoutCalendarConflict(event.startsAt, this.calendarEvents());
+    const calendarConflictLabel = calendarConflict
+      ? calendarConflict.kind === 'during'
+        ? 'Calendar conflict'
+        : 'Near calendar event'
+      : null;
 
     return {
       id: event.id,
       title: event.title,
       startsAtLabel: this.formatStartsAt(event.startsAt),
+      isBooked: event.isBooked,
       location: event.location,
       trainerName,
       trainerImageUrl: event.trainerImageUrl,
       trainerInitials: this.toInitials(trainerName),
       openSpotsLabel: spots.label,
       openSpotsClass: spots.className,
-      capacityLabel: this.toCapacityLabel(event)
+      capacityLabel: this.toCapacityLabel(event),
+      calendarConflictLabel,
+      calendarConflictClass: calendarConflict
+        ? calendarConflict.kind === 'during'
+          ? 'calendar-conflict-chip calendar-conflict-chip-during'
+          : 'calendar-conflict-chip calendar-conflict-chip-near'
+        : null,
+      calendarConflictHint: calendarConflict
+        ? `${calendarConflictLabel}: ${calendarConflict.eventTitle}`
+        : null
     };
   }
 
@@ -185,6 +215,29 @@ export class WorkoutsDetailComponent {
     }
 
     return { label: `${openSpots} left`, className: 'spot-chip spots-open' };
+  }
+
+  private compareWorkouts(left: DataBeat81Event, right: DataBeat81Event): number {
+    if (left.isBooked !== right.isBooked) {
+      return left.isBooked ? -1 : 1;
+    }
+
+    const leftEpoch = Date.parse(left.startsAt);
+    const rightEpoch = Date.parse(right.startsAt);
+
+    if (!Number.isFinite(leftEpoch) && !Number.isFinite(rightEpoch)) {
+      return left.id.localeCompare(right.id);
+    }
+
+    if (!Number.isFinite(leftEpoch)) {
+      return 1;
+    }
+
+    if (!Number.isFinite(rightEpoch)) {
+      return -1;
+    }
+
+    return leftEpoch - rightEpoch;
   }
 
   private formatStartsAt(startsAt: string): string {

@@ -205,6 +205,7 @@ p {
   display: flex;
   align-items: center;
   gap: 0.55rem;
+  flex-wrap: wrap;
 }
 
 .session-title,
@@ -241,6 +242,17 @@ p {
   white-space: nowrap;
 }
 
+.booked-chip {
+  border-radius: 999px;
+  padding: 0.2rem 0.62rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  background: rgb(35 90 200 / 0.16);
+  color: rgb(16 50 120);
+}
+
 .spots-open {
   background: rgb(11 107 42 / 0.14);
   color: #0b6b2a;
@@ -259,6 +271,25 @@ p {
 .spots-unknown {
   background: rgb(83 96 130 / 0.14);
   color: var(--ink-muted);
+}
+
+.calendar-conflict-chip {
+  border-radius: 999px;
+  padding: 0.2rem 0.62rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.calendar-conflict-chip-during {
+  background: rgb(155 28 28 / 0.16);
+  color: #8b1a1a;
+}
+
+.calendar-conflict-chip-near {
+  background: rgb(139 94 0 / 0.16);
+  color: #7a5200;
 }
 
 .status-card ul {

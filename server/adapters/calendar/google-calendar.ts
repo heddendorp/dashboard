@@ -16,6 +16,10 @@ export interface GoogleCalendarEventsResult {
   fetchedAt: string;
 }
 
+interface GoogleCalendarEventsOptions {
+  maxResults?: number;
+}
+
 function resolveCalendarId(): string {
   const calendarId = process.env['GOOGLE_CALENDAR_ID']?.trim();
   if (!calendarId) {
@@ -25,7 +29,11 @@ function resolveCalendarId(): string {
   return calendarId;
 }
 
-function resolveMaxResults(): number {
+function resolveMaxResults(maxResults: number | undefined): number {
+  if (typeof maxResults === 'number' && Number.isInteger(maxResults) && maxResults > 0) {
+    return maxResults;
+  }
+
   const parsed = Number.parseInt(process.env['GOOGLE_CALENDAR_MAX_RESULTS'] ?? '', 10);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : DEFAULT_MAX_RESULTS;
 }
@@ -94,7 +102,9 @@ function normalizeGoogleEvent(event: {
   };
 }
 
-export async function fetchGoogleCalendarEvents(): Promise<GoogleCalendarEventsResult> {
+export async function fetchGoogleCalendarEvents(
+  options: GoogleCalendarEventsOptions = {}
+): Promise<GoogleCalendarEventsResult> {
   const credentials = parseServiceAccountCredentials();
   const auth = new google.auth.JWT({
     email: credentials.client_email,
@@ -107,7 +117,7 @@ export async function fetchGoogleCalendarEvents(): Promise<GoogleCalendarEventsR
     calendarId: resolveCalendarId(),
     singleEvents: true,
     orderBy: 'startTime',
-    maxResults: resolveMaxResults(),
+    maxResults: resolveMaxResults(options.maxResults),
     timeMin: new Date().toISOString(),
     timeZone: resolveTimeZone()
   });

@@ -1,11 +1,11 @@
 <section class="detail-panel" aria-labelledby="workouts-detail-title">
   <header class="detail-header">
-    <button type="button" class="back-button" (click)="goBack()">Back</button>
     <div>
       <p class="widget-label">Beat81 workouts</p>
-      <h2 id="workouts-detail-title">Expanded workout view</h2>
+      <h2 id="workouts-detail-title" style="view-transition-name: workouts-title">Expanded workout view</h2>
       <p class="detail-hint">Returns to dashboard after 15 seconds of inactivity.</p>
     </div>
+    <button type="button" class="back-button" (click)="goBack()">Back</button>
   </header>
 
   <div class="chip-row" role="group" aria-label="Workout filters">
@@ -46,7 +46,7 @@
   } @else if (filteredWorkouts().length === 0) {
     <p class="next-step">No workouts match the selected filters.</p>
   } @else {
-    <div class="list-shell">
+    <div class="list-shell" style="view-transition-name: workouts-list">
       <ul class="session-list" aria-label="Detailed Beat81 workouts">
         @for (workout of filteredWorkouts(); track workout.id) {
           <li class="session-item">
@@ -67,7 +67,19 @@
             <div class="session-meta">
               <div class="session-title-row">
                 <p class="session-title">{{ workout.title }}</p>
+                @if (workout.isBooked) {
+                  <span class="booked-chip">Planned</span>
+                }
                 <span [class]="workout.openSpotsClass">{{ workout.openSpotsLabel }}</span>
+                @if (workout.calendarConflictLabel && workout.calendarConflictClass) {
+                  <span
+                    [class]="workout.calendarConflictClass"
+                    [attr.title]="workout.calendarConflictHint"
+                    [attr.aria-label]="workout.calendarConflictHint"
+                  >
+                    {{ workout.calendarConflictLabel }}
+                  </span>
+                }
               </div>
               <p class="session-detail">{{ workout.startsAtLabel }} · {{ workout.location }}</p>
               <p class="session-detail">

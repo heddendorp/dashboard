@@ -1,8 +1,8 @@
+import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
-import type { WidgetShell } from '../../../../core/dashboard.models';
 import type {
   DataBeat81Event,
   DataCalendarEvent,
@@ -10,7 +10,8 @@ import type {
   DataWidgetStatus
 } from '../../models/data-dashboard.models';
 import { DataDashboardService } from '../../services/data-dashboard.service';
-import { isBerlinWorkdayAtOrAfter } from '../../utils/berlin-workout-filter';
+import { isBerlinAtOrAfter, isBerlinWorkday } from '../../utils/berlin-workout-filter';
+import { getWorkoutCalendarConflict } from '../../utils/workout-calendar-conflict';
 
 interface DataStatusRow {
   label: string;
@@ -21,25 +22,31 @@ interface DataStatusRow {
 interface Beat81SessionRow {
   id: string;
   title: string;
-  startsAtLabel: string;
+  startsAt: string;
+  isBooked: boolean;
   trainerName: string;
   trainerImageUrl: string | null;
   trainerInitials: string;
   openSpotsLabel: string;
   openSpotsClass: string;
+  calendarConflictLabel: string | null;
+  calendarConflictClass: string | null;
+  calendarConflictHint: string | null;
 }
 
 interface CalendarEventRow {
   id: string;
   title: string;
-  startsAtLabel: string;
+  startsAt: string;
+  endsAt: string;
+  allDay: boolean;
 }
 
 let dataColumnInstanceCounter = 0;
 
 @Component({
   selector: 'app-data-column',
-  imports: [],
+  imports: [DatePipe],
   templateUrl: './data-column.html',
   styleUrl: './data-column.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,58 +60,28 @@ export class DataColumnComponent {
   private readonly router = inject(Router);
   private readonly autoRefreshIntervalMs = 5 * 60 * 1000;
   private readonly workoutEveningCutoffMinutes = 18 * 60 + 30;
+  private readonly weekendWorkoutCutoffMinutes = 11 * 60;
   private readonly collapsedCalendarLimit = 6;
   private readonly collapsedWorkoutLimit = 4;
   private autoRefreshTimer: ReturnType<typeof setInterval> | null = null;
+  private readonly datePipe = new DatePipe('de-DE');
   private readonly instanceId = ++dataColumnInstanceCounter;
-  private readonly calendarDateTimeFormatter = new Intl.DateTimeFormat('de-DE', {
-    weekday: 'short',
-    day: '2-digit',
-    month: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-  private readonly calendarAllDayFormatter = new Intl.DateTimeFormat('de-DE', {
-    weekday: 'short',
-    day: '2-digit',
-    month: '2-digit'
-  });
-  private readonly timeFormatter = new Intl.DateTimeFormat('de-DE', {
-    day: '2-digit',
-    month: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
 
   protected readonly dashboardResource = this.dataDashboardService.dashboardResource;
   protected readonly calendarEvents = this.dataDashboardService.calendarEvents;
   protected readonly beat81Events = this.dataDashboardService.beat81Events;
   protected readonly statusTitleId = `status-title-${this.instanceId}`;
-
-  protected readonly widgets = signal<WidgetShell[]>([
-    {
-      id: 'calendar',
-      title: 'Calendar',
-      description: 'Upcoming events for the household.',
-      nextStep: 'Stage 3 will connect Google Calendar service account data.'
-    },
-    {
-      id: 'shopping',
-      title: 'Shopping List',
-      description: 'Shared list for hallway visibility and quick edits.',
-      nextStep: 'Stage 3 will persist items using Vercel-managed KV.'
-    },
-    {
-      id: 'workouts',
-      title: 'Beat81 Workouts',
-      description: 'Available and planned workout cards.',
-      nextStep: 'Stage 3 will connect the private Beat81 adapter.'
-    }
-  ]);
+  protected readonly workoutConflictCalendarEvents = computed(() => {
+    const detailEvents = this.dataDashboardService.calendarDetailEvents();
+    return detailEvents.length > 0 ? detailEvents : this.calendarEvents();
+  });
 
   protected readonly beat81Sessions = computed<Beat81SessionRow[]>(() =>
     this.beat81Events()
       .filter((event) => this.isVisibleDashboardWorkout(event))
+      .filter((event) => !this.hasCalendarConflict(event))
+      .slice()
+      .sort((left, right) => this.compareWorkouts(left, right))
       .map((event) => this.toSessionRow(event))
   );
   protected readonly calendarRows = computed<CalendarEventRow[]>(() =>
@@ -162,27 +139,15 @@ export class DataColumnComponent {
     });
   }
 
-  protected isWidgetExpandable(widgetId: WidgetShell['id']): boolean {
-    return widgetId === 'calendar' || widgetId === 'workouts';
-  }
-
-  protected onWidgetClick(widgetId: WidgetShell['id'], event: MouseEvent): void {
-    if (!this.isWidgetExpandable(widgetId)) {
-      return;
-    }
-
+  protected onCalendarCardClick(event: MouseEvent): void {
     if (this.isNestedInteractiveTarget(event.target, event.currentTarget)) {
       return;
     }
 
-    this.navigateToWidget(widgetId);
+    this.navigateToRoute('/calendar');
   }
 
-  protected onWidgetKeydown(widgetId: WidgetShell['id'], event: KeyboardEvent): void {
-    if (!this.isWidgetExpandable(widgetId)) {
-      return;
-    }
-
+  protected onCalendarCardKeydown(event: KeyboardEvent): void {
     if (event.key !== 'Enter' && event.key !== ' ') {
       return;
     }
@@ -192,31 +157,28 @@ export class DataColumnComponent {
     }
 
     event.preventDefault();
-    this.navigateToWidget(widgetId);
+    this.navigateToRoute('/calendar');
   }
 
-  protected widgetTransitionName(widgetId: WidgetShell['id']): string | null {
-    if (widgetId === 'calendar') {
-      return 'calendar-tile';
+  protected onWorkoutsCardClick(event: MouseEvent): void {
+    if (this.isNestedInteractiveTarget(event.target, event.currentTarget)) {
+      return;
     }
 
-    if (widgetId === 'workouts') {
-      return 'workouts-tile';
-    }
-
-    return null;
+    this.navigateToRoute('/workouts');
   }
 
-  protected widgetAriaLabel(widget: WidgetShell): string {
-    if (widget.id === 'calendar') {
-      return 'Calendar, tap to open detailed view';
+  protected onWorkoutsCardKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
     }
 
-    if (widget.id === 'workouts') {
-      return 'Beat81 workouts, tap to open detailed view';
+    if (this.isNestedInteractiveTarget(event.target, event.currentTarget)) {
+      return;
     }
 
-    return widget.title;
+    event.preventDefault();
+    this.navigateToRoute('/workouts');
   }
 
   private widgetLabel(health: DataWidgetHealth): string {
@@ -238,15 +200,35 @@ export class DataColumnComponent {
   private toSessionRow(event: DataBeat81Event): Beat81SessionRow {
     const trainerName = event.trainerName || 'Trainer TBD';
     const spots = this.toOpenSpotsIndicator(event.openSpots);
+    const calendarConflict = event.isBooked
+      ? null
+      : getWorkoutCalendarConflict(event.startsAt, this.workoutConflictCalendarEvents());
+
+    const calendarConflictLabel = calendarConflict
+      ? calendarConflict.kind === 'during'
+        ? 'Calendar conflict'
+        : 'Near calendar event'
+      : null;
+
     return {
       id: event.id,
       title: event.title,
-      startsAtLabel: this.formatStartsAt(event.startsAt),
+      startsAt: event.startsAt,
+      isBooked: event.isBooked,
       trainerName,
       trainerImageUrl: event.trainerImageUrl,
       trainerInitials: this.toInitials(trainerName),
       openSpotsLabel: spots.label,
-      openSpotsClass: spots.className
+      openSpotsClass: spots.className,
+      calendarConflictLabel,
+      calendarConflictClass: calendarConflict
+        ? calendarConflict.kind === 'during'
+          ? 'calendar-conflict-chip calendar-conflict-chip-during'
+          : 'calendar-conflict-chip calendar-conflict-chip-near'
+        : null,
+      calendarConflictHint: calendarConflict
+        ? `${calendarConflictLabel}: ${calendarConflict.eventTitle}`
+        : null
     };
   }
 
@@ -254,7 +236,9 @@ export class DataColumnComponent {
     return {
       id: event.id,
       title: event.title,
-      startsAtLabel: this.formatCalendarStartsAt(event)
+      startsAt: event.startsAt,
+      endsAt: event.endsAt,
+      allDay: event.allDay
     };
   }
 
@@ -290,29 +274,7 @@ export class DataColumnComponent {
     this.autoRefreshTimer = null;
   }
 
-  private formatStartsAt(startsAt: string): string {
-    const date = new Date(startsAt);
-    if (Number.isNaN(date.getTime())) {
-      return startsAt || 'Unknown time';
-    }
-
-    return this.timeFormatter.format(date);
-  }
-
-  private formatCalendarStartsAt(event: DataCalendarEvent): string {
-    if (event.allDay) {
-      return this.formatAllDayRange(event.startsAt, event.endsAt);
-    }
-
-    const date = new Date(event.startsAt);
-    if (Number.isNaN(date.getTime())) {
-      return event.startsAt || 'Unknown time';
-    }
-
-    return this.calendarDateTimeFormatter.format(date);
-  }
-
-  private formatAllDayRange(startsAt: string, endsAt: string): string {
+  protected formatAllDayRange(startsAt: string, endsAt: string): string {
     const startDate = this.parseLocalDate(startsAt);
     const endExclusiveDate = this.parseLocalDate(endsAt);
     if (!startDate) {
@@ -325,8 +287,12 @@ export class DataColumnComponent {
       endDate.setTime(startDate.getTime());
     }
 
-    const startLabel = this.calendarAllDayFormatter.format(startDate);
-    const endLabel = this.calendarAllDayFormatter.format(endDate);
+    const startLabel = this.datePipe.transform(startDate, 'EEE dd.MM', 'Europe/Berlin', 'de-DE');
+    const endLabel = this.datePipe.transform(endDate, 'EEE dd.MM', 'Europe/Berlin', 'de-DE');
+
+    if (!startLabel || !endLabel) {
+      return 'Ganztägig';
+    }
 
     if (startLabel === endLabel) {
       return `${startLabel} · Ganztägig`;
@@ -372,15 +338,53 @@ export class DataColumnComponent {
   }
 
   private isVisibleDashboardWorkout(event: DataBeat81Event): boolean {
+    if (event.isBooked) {
+      return true;
+    }
+
     if (event.openSpots === null || event.openSpots < 2) {
       return false;
     }
 
-    return isBerlinWorkdayAtOrAfter(event.startsAt, this.workoutEveningCutoffMinutes);
+    if (!isBerlinWorkday(event.startsAt)) {
+      return isBerlinAtOrAfter(event.startsAt, this.weekendWorkoutCutoffMinutes);
+    }
+
+    return isBerlinAtOrAfter(event.startsAt, this.workoutEveningCutoffMinutes);
   }
 
-  private navigateToWidget(widgetId: WidgetShell['id']): void {
-    const route = widgetId === 'calendar' ? '/calendar' : '/workouts';
+  private hasCalendarConflict(workout: DataBeat81Event): boolean {
+    if (workout.isBooked) {
+      return false;
+    }
+
+    return getWorkoutCalendarConflict(workout.startsAt, this.workoutConflictCalendarEvents()) !== null;
+  }
+
+  private compareWorkouts(left: DataBeat81Event, right: DataBeat81Event): number {
+    if (left.isBooked !== right.isBooked) {
+      return left.isBooked ? -1 : 1;
+    }
+
+    const leftEpoch = Date.parse(left.startsAt);
+    const rightEpoch = Date.parse(right.startsAt);
+
+    if (!Number.isFinite(leftEpoch) && !Number.isFinite(rightEpoch)) {
+      return left.id.localeCompare(right.id);
+    }
+
+    if (!Number.isFinite(leftEpoch)) {
+      return 1;
+    }
+
+    if (!Number.isFinite(rightEpoch)) {
+      return -1;
+    }
+
+    return leftEpoch - rightEpoch;
+  }
+
+  private navigateToRoute(route: '/calendar' | '/workouts'): void {
     void this.router.navigateByUrl(route);
   }
 

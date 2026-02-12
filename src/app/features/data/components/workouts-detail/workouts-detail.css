@@ -14,12 +14,19 @@
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  view-transition-name: workouts-tile
 }
 
 .detail-header {
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 0.8rem;
+}
+
+.detail-header > div {
+  min-width: 0;
+  flex: 1;
 }
 
 .back-button {
@@ -30,6 +37,8 @@
   padding: 0.35rem 0.75rem;
   font: inherit;
   cursor: pointer;
+  flex: 0 0 auto;
+  align-self: flex-start;
 }
 
 .back-button:focus-visible,
@@ -153,6 +162,7 @@ h2 {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .session-title {
@@ -178,6 +188,17 @@ h2 {
   white-space: nowrap;
 }
 
+.booked-chip {
+  border-radius: 999px;
+  padding: 0.2rem 0.62rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  background: rgb(35 90 200 / 0.16);
+  color: rgb(16 50 120);
+}
+
 .spots-open {
   background: rgb(11 107 42 / 0.14);
   color: #0b6b2a;
@@ -196,4 +217,23 @@ h2 {
 .spots-unknown {
   background: rgb(83 96 130 / 0.14);
   color: var(--ink-muted);
+}
+
+.calendar-conflict-chip {
+  border-radius: 999px;
+  padding: 0.2rem 0.62rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.calendar-conflict-chip-during {
+  background: rgb(155 28 28 / 0.16);
+  color: #8b1a1a;
+}
+
+.calendar-conflict-chip-near {
+  background: rgb(139 94 0 / 0.16);
+  color: #7a5200;
 }

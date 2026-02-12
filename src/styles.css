@@ -1,3 +1,30 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import "tailwindcss";
+
+:root {
+  --ink-strong: rgb(18 34 64);
+  --ink: rgb(39 59 91);
+  --ink-muted: rgb(70 89 123);
+  --accent-ink: rgb(154 74 0);
+  --panel-bg: rgb(255 255 255 / 0.9);
+  --panel-tint: rgb(255 240 222 / 0.82);
+  --panel-stroke: rgb(66 84 123 / 0.24);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 0% 0%, rgb(255 238 211 / 0.9), transparent 35%),
+    radial-gradient(circle at 100% 100%, rgb(214 243 255 / 0.9), transparent 45%),
+    linear-gradient(180deg, rgb(247 250 255), rgb(236 242 253));
+}

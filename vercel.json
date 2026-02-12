@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "angular",
+  "functions": {
+    "api/[[...route]].ts": {
+      "runtime": "nodejs22.x"
+    }
+  }
+}

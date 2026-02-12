@@ -1,11 +1,94 @@
 <aside aria-labelledby="frog-title">
   <div class="frog-panel">
     <p class="widget-label">frog area</p>
-    <h2 id="frog-title">Interactive Frog Reserved</h2>
-    <p>
-      This panel is fixed to the right third so Stage 2 can add sprite states and touch interactions
-      without changing the main layout.
-    </p>
-    <button type="button" disabled aria-disabled="true">Frog interactions start in Stage 2</button>
+    <h2 id="frog-title">Little Toad</h2>
+    <figure class="frog-sprite">
+      <div class="frog-scene">
+        @if (showFood()) {
+          <img
+            class="frog-food"
+            ngSrc="/frog/Apple.png"
+            width="666"
+            height="375"
+            alt=""
+            aria-hidden="true"
+          />
+        }
+        <div class="frog-celestial" aria-hidden="true">
+          @if (isDaytime()) {
+            <img
+              class="frog-celestial-image frog-celestial-image-sun"
+              ngSrc="/frog/sun.png"
+              width="360"
+              height="360"
+              alt=""
+              aria-hidden="true"
+            />
+          } @else {
+            <img
+              class="frog-celestial-image frog-celestial-image-moon"
+              ngSrc="/frog/moon.png"
+              width="500"
+              height="500"
+              alt=""
+              aria-hidden="true"
+            />
+          }
+        </div>
+        <div [class]="'frog-flower ' + flowerSeasonClass()" aria-hidden="true"></div>
+        <div [class]="'frog-ground ' + groundSeasonClass()" aria-hidden="true"></div>
+        <div class="frog-sprite-viewport">
+          @if (isAttacking()) {
+            <img
+              class="frog-sprite-strip frog-sprite-strip-attack"
+              ngSrc="/frog/GreenBlue/ToxicFrogGreenBlue_Attack.png"
+              width="288"
+              height="48"
+              alt="Animierter Frosch"
+              priority
+            />
+          } @else if (isExploding()) {
+            <img
+              class="frog-sprite-strip frog-sprite-strip-explosion"
+              ngSrc="/frog/GreenBlue/ToxicFrogGreenBlue_Explosion.png"
+              width="432"
+              height="48"
+              alt="Animierter Frosch"
+              priority
+            />
+          } @else if (isHurt()) {
+            <img
+              class="frog-sprite-strip frog-sprite-strip-hurt"
+              ngSrc="/frog/GreenBlue/ToxicFrogGreenBlue_Hurt.png"
+              width="192"
+              height="48"
+              alt="Animierter Frosch"
+              priority
+            />
+          } @else {
+            <img
+              class="frog-sprite-strip frog-sprite-strip-idle"
+              ngSrc="/frog/GreenBlue/ToxicFrogGreenBlue_Idle.png"
+              width="384"
+              height="48"
+              alt="Animierter Frosch"
+              priority
+            />
+          }
+        </div>
+      </div>
+    </figure>
+    <button type="button" class="feed-button" [disabled]="isAttacking()" (click)="feedToad()">
+      Feed
+    </button>
+    <div class="happiness">
+      <div class="happiness-header">
+        <span id="happiness-label">Happiness</span>
+        <span aria-hidden="true">{{ happiness() }}%</span>
+      </div>
+      <progress aria-labelledby="happiness-label" max="100" [value]="happiness()">
+        {{ happiness() }}%
+      </progress>
+    </div>
   </div>
 </aside>

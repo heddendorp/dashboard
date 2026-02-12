@@ -42,12 +42,12 @@ api/
   beat81/event-types.ts
   shopping/index.ts
   shopping/[id].ts
+server/
   auth.ts
   with-auth.ts
   routes.ts
   types.ts
   adapters/
-  contracts/
 docs/
   implementation-plan.md
   runbooks/
@@ -161,8 +161,8 @@ Planned for later Stage 3:
 To reduce merge conflicts in parallel work:
 - `src/app/features/frog/**` is Stage 2 owned.
 - `src/app/features/data/**` is Stage 3 owned.
-- `api/adapters/**` and `api/contracts/**` are Stage 3 owned.
-- Shared files (`src/app/app.ts`, `src/app/app.html`, `api/types.ts`, `api/routes.ts`) should only receive narrow, explicit contract changes.
+- `server/adapters/**` is Stage 3 owned.
+- Shared files (`src/app/app.ts`, `src/app/app.html`, `server/types.ts`, `server/routes.ts`) should only receive narrow, explicit contract changes.
 
 ## Parallel Branch Workflow
 Baseline branch:

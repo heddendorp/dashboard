@@ -26,6 +26,7 @@ export interface CalendarEvent {
   title: string;
   startsAt: string;
   endsAt: string;
+  allDay: boolean;
 }
 
 export interface ShoppingItem {
@@ -41,12 +42,45 @@ export interface WorkoutSlot {
   location: string;
 }
 
+export interface Beat81EventType {
+  id: string;
+  name: string;
+}
+
+export interface Beat81EventTypesPayload {
+  items: Beat81EventType[];
+  count: number;
+  sourceTotal: number | null;
+  fetchedAt: string;
+}
+
+export interface Beat81Event {
+  id: string;
+  title: string;
+  startsAt: string;
+  location: string;
+  trainerName: string | null;
+  trainerImageUrl: string | null;
+  maxParticipants: number | null;
+  currentParticipants: number | null;
+  openSpots: number | null;
+}
+
+export interface Beat81EventsPayload {
+  items: Beat81Event[];
+  count: number;
+  sourceTotal: number | null;
+  fetchedAt: string;
+}
+
 export interface DashboardPayload {
   generatedAt: string;
   timezone: string;
   calendar: CalendarEvent[];
   shopping: ShoppingItem[];
   workouts: WorkoutSlot[];
+  beat81EventTypes: Beat81EventType[];
+  beat81Events: Beat81Event[];
   health: WidgetHealth[];
 }
 

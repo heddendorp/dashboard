@@ -12,6 +12,10 @@ Branch: `codex/stage3-data`
 - `api/adapters/shopping/`
 - `api/adapters/beat81/`
 - `api/contracts/`
+- `api/health.ts`
+- `api/dashboard.ts`
+- `api/beat81/`
+- `api/shopping/`
 - `api/routes.ts`
 - `api/types.ts`
 - `src/app/features/data/components/`

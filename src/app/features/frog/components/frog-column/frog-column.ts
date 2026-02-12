@@ -28,6 +28,8 @@ type GroundSeasonClass =
   | 'frog-ground-summer'
   | 'frog-ground-autumn';
 
+let frogColumnInstanceCounter = 0;
+
 @Component({
   selector: 'app-frog-column',
   imports: [NgOptimizedImage],

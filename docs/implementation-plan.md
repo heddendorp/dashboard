@@ -5,7 +5,7 @@ Build a touch-first smart hallway dashboard using Angular 21 + signals + Tailwin
 
 Architecture baseline:
 - Static Angular frontend (no Angular SSR runtime in V1)
-- Single Vercel BFF function for private APIs (`/api/*`)
+- File-based Vercel BFF routes for private APIs (`/api/*`)
 - Basic auth/passcode gate for API access
 - Vercel-managed KV (Upstash via Marketplace) in later stage
 
@@ -25,7 +25,7 @@ Create the baseline that allows parallel implementation work for Frog and Data M
 - Keep left area as calendar/shopping/workout widget placeholders.
 - Add Vercel BFF skeleton with typed contracts and health/dashboard endpoints.
 - Add basic auth middleware for backend routes.
-- Add Vercel routing config for one backend entrypoint.
+- Add Vercel routing config for backend API endpoints.
 
 ### Verification
 - `npm run build` succeeds.

@@ -205,7 +205,10 @@ export class FrogColumnComponent implements OnDestroy {
     }
 
     this.happinessDecayTimeout = setTimeout(() => {
-      this.happiness.update((value) => Math.max(0, value - HAPPINESS_DECAY_STEP));
+      const executedAt = new Date();
+      if (!this.isInQuietHours(executedAt)) {
+        this.happiness.update((value) => Math.max(0, value - HAPPINESS_DECAY_STEP));
+      }
       this.scheduleNextHappinessDecay();
     }, HAPPINESS_DECAY_INTERVAL_MS);
   }

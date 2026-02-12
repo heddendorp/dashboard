@@ -181,12 +181,27 @@ async function respondBeat81Events(req: ApiRequest, res: ApiResponse): Promise<v
         readNonNegativeInt(req, 'skip') ??
         readNonNegativeInt(req, '$skip') ??
         undefined,
-      locationId: readFirstQueryParam(req, ['locationId', 'location_id'])
+      locationId: readFirstQueryParam(req, ['locationId', 'location_id']),
+      userId: readFirstQueryParam(req, ['userId', 'user_id'])
     });
     res.status(200).json(payload);
   } catch (error) {
     res.status(502).json({
       error: 'beat81_unavailable',
+      message: getErrorMessage(error)
+    });
+  }
+}
+
+async function respondCalendarEvents(req: ApiRequest, res: ApiResponse): Promise<void> {
+  try {
+    const payload = await fetchGoogleCalendarEvents({
+      maxResults: readLimit(req)
+    });
+    res.status(200).json(payload);
+  } catch (error) {
+    res.status(502).json({
+      error: 'calendar_unavailable',
       message: getErrorMessage(error)
     });
   }
@@ -214,6 +229,11 @@ export async function handleRoute(req: ApiRequest, res: ApiResponse, route: stri
 
   if (resource === 'beat81' && route[1] === 'events' && method === 'GET') {
     await respondBeat81Events(req, res);
+    return;
+  }
+
+  if (resource === 'calendar' && route[1] === 'events' && method === 'GET') {
+    await respondCalendarEvents(req, res);
     return;
   }
 

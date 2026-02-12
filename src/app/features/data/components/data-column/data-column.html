@@ -1,124 +1,127 @@
 <section class="widgets" aria-label="Core widgets">
-  @for (widget of widgets(); track widget.id) {
-    <article
-      class="widget-card"
-      [class.calendar-card]="widget.id === 'calendar'"
-      [class.workout-card]="widget.id === 'workouts'"
-      [attr.aria-label]="widget.title"
-    >
-      <p class="widget-label" [class.widget-headline]="widget.id === 'calendar' || widget.id === 'workouts'">
-        @if (widget.id === 'workouts') {
-          Beat81 workouts
-        } @else {
-          {{ widget.id }}
-        }
-      </p>
-      @if (widget.id === 'shopping') {
-        <h2>{{ widget.title }}</h2>
-      }
-
-      @if (widget.id === 'calendar') {
-        <div class="calendar-tile-body">
-          @if (dashboardResource.isLoading()) {
-            <p class="next-step">Loading upcoming calendar events…</p>
-          } @else if (dashboardErrorMessage(); as errorMessage) {
-            <p class="next-step error-text">{{ errorMessage }}</p>
-            <button type="button" class="retry-button" (click)="dashboardResource.reload()">
-              Retry
-            </button>
-          } @else if (calendarRows().length === 0) {
-            <p class="next-step">No upcoming calendar events.</p>
-          } @else {
-            <div class="calendar-list-shell">
+  <article
+    class="widget-card calendar-card widget-card-interactive"
+    aria-label="Calendar, tap to open detailed view"
+    role="button"
+    tabindex="0"
+    style="view-transition-name: calendar-tile"
+    (click)="onCalendarCardClick($event)"
+    (keydown)="onCalendarCardKeydown($event)"
+  >
+    <p class="widget-label widget-headline" style="view-transition-name: calendar-title">calendar</p>
+    <div class="calendar-tile-body">
+      @if (dashboardResource.isLoading()) {
+        <p class="next-step">Loading upcoming calendar events…</p>
+      } @else if (dashboardErrorMessage(); as errorMessage) {
+        <p class="next-step error-text">{{ errorMessage }}</p>
+        <button type="button" class="retry-button" (click)="dashboardResource.reload()">
+          Retry
+        </button>
+      } @else if (calendarRows().length === 0) {
+        <p class="next-step">No upcoming calendar events.</p>
+      } @else {
+            <div class="calendar-list-shell" style="view-transition-name: calendar-list">
               <ul class="calendar-event-list" aria-label="Upcoming calendar events">
                 @for (event of visibleCalendarRows(); track event.id) {
                   <li class="calendar-event-item">
                     <p class="calendar-event-title">{{ event.title }}</p>
-                    <p class="calendar-event-time">{{ event.startsAtLabel }}</p>
+                    <p class="calendar-event-time">
+                      @if (event.allDay) {
+                        {{ formatAllDayRange(event.startsAt, event.endsAt) }}
+                      } @else {
+                        {{ (event.startsAt | date: 'EEE dd.MM HH:mm' : 'Europe/Berlin' : 'de-DE') ?? event.startsAt }}
+                      }
+                    </p>
                   </li>
                 }
               </ul>
             </div>
-          }
-        </div>
-      } @else if (widget.id !== 'workouts') {
-        <p>{{ widget.description }}</p>
-        <p class="next-step">{{ widget.nextStep }}</p>
+      }
+    </div>
+  </article>
+
+  <article class="widget-card">
+    <p class="widget-label">shopping</p>
+    <h2>Shopping List</h2>
+    <p>Shared list for hallway visibility and quick edits.</p>
+    <p class="next-step">Stage 3 will persist items using Vercel-managed KV.</p>
+  </article>
+
+  <article
+    class="widget-card workout-card widget-card-interactive"
+    aria-label="Beat81 workouts, tap to open detailed view"
+    role="button"
+    tabindex="0"
+    style="view-transition-name: workouts-tile"
+    (click)="onWorkoutsCardClick($event)"
+    (keydown)="onWorkoutsCardKeydown($event)"
+  >
+    <p class="widget-label widget-headline" style="view-transition-name: workouts-title">Beat81 workouts</p>
+    <div class="workouts-tile-body">
+      @if (dashboardResource.isLoading()) {
+        <p class="next-step">Loading upcoming Beat81 workouts…</p>
+      } @else if (dashboardErrorMessage(); as errorMessage) {
+        <p class="next-step error-text">{{ errorMessage }}</p>
+        <button type="button" class="retry-button" (click)="dashboardResource.reload()">
+          Retry
+        </button>
+      } @else if (beat81Sessions().length === 0) {
+        <p class="next-step">
+          No matching Beat81 workouts (workdays after 18:30, weekends after 11:00, and 2+ open spots).
+        </p>
       } @else {
-        <div class="workouts-tile-body">
-          @if (dashboardResource.isLoading()) {
-            <p class="next-step">Loading upcoming Beat81 workouts…</p>
-          } @else if (dashboardErrorMessage(); as errorMessage) {
-            <p class="next-step error-text">{{ errorMessage }}</p>
-            <button type="button" class="retry-button" (click)="dashboardResource.reload()">
-              Retry
-            </button>
-          } @else if (beat81Sessions().length === 0) {
-            <p class="next-step">No upcoming Beat81 workouts found for this location.</p>
-          } @else {
-            <div
-              class="workouts-list-shell"
-              [class.workouts-list-shell-expanded]="workoutsExpanded()"
-              [class.workouts-list-shell-interactive]="hasMoreBeat81Items()"
-              role="button"
-              [attr.tabindex]="hasMoreBeat81Items() ? 0 : -1"
-              [attr.aria-expanded]="workoutsExpanded()"
-              [attr.aria-label]="
-                hasMoreBeat81Items() ? 'Expand workouts list for 15 seconds' : 'Workouts list'
-              "
-              (click)="expandWorkoutsTemporarily()"
-              (keydown.enter)="expandWorkoutsTemporarily()"
-              (keydown.space)="expandWorkoutsTemporarily(); $event.preventDefault()"
-            >
-              <ul class="event-session-list" aria-label="Upcoming Beat81 workouts">
-                @for (session of visibleBeat81Sessions(); track session.id) {
-                  <li class="session-item">
-                    @if (session.trainerImageUrl) {
-                      <img
-                        [src]="session.trainerImageUrl"
-                        [alt]="session.trainerName + ' profile photo'"
-                        width="40"
-                        height="40"
-                        loading="lazy"
-                        decoding="async"
-                        referrerpolicy="no-referrer"
-                      />
-                    } @else {
-                      <span class="session-avatar-fallback" aria-hidden="true">
-                        {{ session.trainerInitials }}
+        <div class="workouts-list-shell" style="view-transition-name: workouts-list">
+          <ul class="event-session-list" aria-label="Upcoming Beat81 workouts">
+            @for (session of visibleBeat81Sessions(); track session.id) {
+              <li class="session-item">
+                @if (session.trainerImageUrl) {
+                  <img
+                    [src]="session.trainerImageUrl"
+                    [alt]="session.trainerName + ' profile photo'"
+                    width="40"
+                    height="40"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                  />
+                } @else {
+                  <span class="session-avatar-fallback" aria-hidden="true">
+                    {{ session.trainerInitials }}
+                  </span>
+                }
+
+                <div class="session-meta">
+                  <div class="session-head">
+                    <p class="session-title">{{ session.title }}</p>
+                    @if (session.isBooked) {
+                      <span class="booked-chip">Planned</span>
+                    }
+                    <span [class]="session.openSpotsClass">{{ session.openSpotsLabel }}</span>
+                    @if (session.calendarConflictLabel && session.calendarConflictClass) {
+                      <span
+                        [class]="session.calendarConflictClass"
+                        [attr.title]="session.calendarConflictHint"
+                        [attr.aria-label]="session.calendarConflictHint"
+                      >
+                        {{ session.calendarConflictLabel }}
                       </span>
                     }
-
-                    <div class="session-meta">
-                      <div class="session-head">
-                        <p class="session-title">{{ session.title }}</p>
-                        <span [class]="session.openSpotsClass">{{ session.openSpotsLabel }}</span>
-                      </div>
-                      <p class="session-detail">
-                        {{ session.startsAtLabel }}
-                        @if (session.trainerName !== 'Trainer TBD') {
-                          · {{ session.trainerName }}
-                        }
-                      </p>
-                    </div>
-                  </li>
-                }
-              </ul>
-            </div>
-            @if (hasMoreBeat81Items()) {
-              <p class="next-step workouts-hint">
-                @if (workoutsExpanded()) {
-                  Expanded view - returns in 15s
-                } @else {
-                  Tap to expand workouts
-                }
-              </p>
+                  </div>
+                  <p class="session-detail">
+                    {{ (session.startsAt | date: 'EEE dd.MM HH:mm' : 'Europe/Berlin' : 'de-DE') ?? session.startsAt }}
+                    @if (session.trainerName !== 'Trainer TBD') {
+                      · {{ session.trainerName }}
+                    }
+                  </p>
+                </div>
+              </li>
             }
-          }
+          </ul>
         </div>
+        <p class="next-step workouts-hint">Tap tile for expanded filters and full list.</p>
       }
-    </article>
-  }
+    </div>
+  </article>
 
   <section class="status-card" [attr.aria-labelledby]="statusTitleId">
     <h2 [id]="statusTitleId">System Status</h2>

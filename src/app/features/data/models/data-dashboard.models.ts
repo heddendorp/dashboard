@@ -25,6 +25,7 @@ export interface DataBeat81Event {
   title: string;
   startsAt: string;
   location: string;
+  isBooked: boolean;
   trainerName: string | null;
   trainerImageUrl: string | null;
   maxParticipants: number | null;
@@ -39,4 +40,17 @@ export interface DataDashboardPayload {
   beat81EventTypes: DataBeat81EventType[];
   beat81Events: DataBeat81Event[];
   health: DataWidgetHealth[];
+}
+
+export interface DataCalendarEventsPayload {
+  items: DataCalendarEvent[];
+  count: number;
+  fetchedAt: string;
+}
+
+export interface DataBeat81EventsPayload {
+  items: DataBeat81Event[];
+  count: number;
+  sourceTotal: number | null;
+  fetchedAt: string;
 }

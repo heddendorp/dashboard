@@ -1,0 +1,37 @@
+<section class="detail-panel" aria-labelledby="calendar-detail-title">
+  <header class="detail-header">
+    <div class="detail-header-text">
+      <p class="widget-label">Calendar</p>
+      <h2 id="calendar-detail-title" style="view-transition-name: calendar-title">Expanded calendar view</h2>
+      <p class="detail-hint">Returns to dashboard after 15 seconds of inactivity.</p>
+    </div>
+    <div class="detail-header-actions">
+      <button type="button" class="detail-back-button" (click)="goBack()">Back</button>
+    </div>
+  </header>
+
+  @if (calendarResource.isLoading()) {
+    <p class="next-step">Loading calendar details…</p>
+  } @else if (errorMessage(); as error) {
+    <p class="next-step error-text">{{ error }}</p>
+    <button type="button" class="retry-button" (click)="calendarResource.reload()">Retry</button>
+  } @else if (groupedRows().length === 0) {
+    <p class="next-step">No upcoming calendar events.</p>
+  } @else {
+    <div class="groups-shell" style="view-transition-name: calendar-list">
+      @for (group of groupedRows(); track group.id) {
+        <section class="day-group" [attr.aria-labelledby]="'calendar-day-' + group.id">
+          <h3 [id]="'calendar-day-' + group.id">{{ group.label }}</h3>
+          <ul class="event-list">
+            @for (event of group.items; track event.id) {
+              <li class="event-item">
+                <p class="event-title">{{ event.title }}</p>
+                <p class="event-time">{{ event.startsAtLabel }}</p>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+  }
+</section>

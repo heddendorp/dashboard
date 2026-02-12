@@ -1,0 +1,239 @@
+:host.workouts-detail {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+.detail-panel {
+  border-radius: 1rem;
+  border: 1px solid var(--panel-stroke);
+  background: var(--panel-bg);
+  padding: 1rem;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  view-transition-name: workouts-tile
+}
+
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.detail-header > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.back-button {
+  border: 1px solid var(--panel-stroke);
+  border-radius: 0.6rem;
+  background: rgb(255 255 255 / 0.82);
+  color: var(--ink-strong);
+  padding: 0.35rem 0.75rem;
+  font: inherit;
+  cursor: pointer;
+  flex: 0 0 auto;
+  align-self: flex-start;
+}
+
+.back-button:focus-visible,
+.chip-button:focus-visible,
+.retry-button:focus-visible {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 2px;
+}
+
+.widget-label {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  color: var(--accent-ink);
+}
+
+h2 {
+  margin: 0.25rem 0 0;
+  color: var(--ink-strong);
+}
+
+.detail-hint {
+  margin: 0.3rem 0 0;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+.chip-row {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.chip-button {
+  border: 1px solid var(--panel-stroke);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.72);
+  color: var(--ink-strong);
+  padding: 0.25rem 0.65rem;
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.chip-button-active {
+  border-color: rgb(35 90 200 / 0.45);
+  background: rgb(35 90 200 / 0.12);
+  color: rgb(16 50 120);
+}
+
+.next-step {
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+.error-text {
+  color: #9b1c1c;
+}
+
+.retry-button {
+  border: 1px solid var(--panel-stroke);
+  border-radius: 0.55rem;
+  background: rgb(255 255 255 / 0.7);
+  color: var(--ink-strong);
+  padding: 0.3rem 0.65rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.list-shell {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.15rem;
+}
+
+.session-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.session-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  border-bottom: 1px solid rgb(83 96 130 / 0.16);
+  padding-bottom: 0.55rem;
+}
+
+.session-item img,
+.session-avatar-fallback {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.session-item img {
+  object-fit: cover;
+}
+
+.session-avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(83 96 130 / 0.18);
+  color: var(--ink-strong);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.session-meta {
+  min-width: 0;
+}
+
+.session-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.session-title {
+  margin: 0;
+  color: var(--ink-strong);
+  font-weight: 600;
+  font-size: 1.12rem;
+  line-height: 1.2;
+}
+
+.session-detail {
+  margin: 0.15rem 0 0;
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+}
+
+.spot-chip {
+  border-radius: 999px;
+  padding: 0.2rem 0.62rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.booked-chip {
+  border-radius: 999px;
+  padding: 0.2rem 0.62rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  background: rgb(35 90 200 / 0.16);
+  color: rgb(16 50 120);
+}
+
+.spots-open {
+  background: rgb(11 107 42 / 0.14);
+  color: #0b6b2a;
+}
+
+.spots-low {
+  background: rgb(139 94 0 / 0.14);
+  color: #8b5e00;
+}
+
+.spots-full {
+  background: rgb(155 28 28 / 0.14);
+  color: #9b1c1c;
+}
+
+.spots-unknown {
+  background: rgb(83 96 130 / 0.14);
+  color: var(--ink-muted);
+}
+
+.calendar-conflict-chip {
+  border-radius: 999px;
+  padding: 0.2rem 0.62rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.calendar-conflict-chip-during {
+  background: rgb(155 28 28 / 0.16);
+  color: #8b1a1a;
+}
+
+.calendar-conflict-chip-near {
+  background: rgb(139 94 0 / 0.16);
+  color: #7a5200;
+}

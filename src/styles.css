@@ -37,3 +37,20 @@ body {
     radial-gradient(circle at 100% 100%, rgb(214 243 255 / 0.9), transparent 45%),
     linear-gradient(180deg, rgb(247 250 255), rgb(236 242 253));
 }
+
+::view-transition-old(calendar-tile),
+::view-transition-new(calendar-tile),
+::view-transition-old(workouts-tile),
+::view-transition-new(workouts-tile) {
+  animation-duration: 220ms;
+  animation-timing-function: ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(calendar-tile),
+  ::view-transition-new(calendar-tile),
+  ::view-transition-old(workouts-tile),
+  ::view-transition-new(workouts-tile) {
+    animation-duration: 1ms;
+  }
+}

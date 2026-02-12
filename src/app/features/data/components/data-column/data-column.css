@@ -29,6 +29,15 @@
   overflow: hidden;
 }
 
+.widget-card-interactive {
+  cursor: pointer;
+}
+
+.widget-card-interactive:focus-visible {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 2px;
+}
+
 .calendar-card,
 .workout-card {
   padding: 1.2rem;
@@ -153,19 +162,6 @@ p {
   overflow-y: auto;
   padding-right: 0.15rem;
   transition: max-height 180ms ease;
-}
-
-.workouts-list-shell-interactive {
-  cursor: pointer;
-}
-
-.workouts-list-shell-expanded {
-  max-height: none;
-}
-
-.workouts-list-shell:focus-visible {
-  outline: 2px solid #1d4ed8;
-  outline-offset: 2px;
 }
 
 .workouts-hint {

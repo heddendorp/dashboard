@@ -4,7 +4,13 @@
       class="widget-card"
       [class.calendar-card]="widget.id === 'calendar'"
       [class.workout-card]="widget.id === 'workouts'"
-      [attr.aria-label]="widget.title"
+      [class.widget-card-interactive]="isWidgetExpandable(widget.id)"
+      [attr.aria-label]="widgetAriaLabel(widget)"
+      [attr.role]="isWidgetExpandable(widget.id) ? 'button' : null"
+      [attr.tabindex]="isWidgetExpandable(widget.id) ? 0 : null"
+      [style.view-transition-name]="widgetTransitionName(widget.id)"
+      (click)="onWidgetClick(widget.id, $event)"
+      (keydown)="onWidgetKeydown(widget.id, $event)"
     >
       <p class="widget-label" [class.widget-headline]="widget.id === 'calendar' || widget.id === 'workouts'">
         @if (widget.id === 'workouts') {
@@ -54,22 +60,9 @@
               Retry
             </button>
           } @else if (beat81Sessions().length === 0) {
-            <p class="next-step">No upcoming Beat81 workouts found for this location.</p>
+            <p class="next-step">No matching Beat81 workouts after 18:30 on workdays with 2+ open spots.</p>
           } @else {
-            <div
-              class="workouts-list-shell"
-              [class.workouts-list-shell-expanded]="workoutsExpanded()"
-              [class.workouts-list-shell-interactive]="hasMoreBeat81Items()"
-              role="button"
-              [attr.tabindex]="hasMoreBeat81Items() ? 0 : -1"
-              [attr.aria-expanded]="workoutsExpanded()"
-              [attr.aria-label]="
-                hasMoreBeat81Items() ? 'Expand workouts list for 15 seconds' : 'Workouts list'
-              "
-              (click)="expandWorkoutsTemporarily()"
-              (keydown.enter)="expandWorkoutsTemporarily()"
-              (keydown.space)="expandWorkoutsTemporarily(); $event.preventDefault()"
-            >
+            <div class="workouts-list-shell">
               <ul class="event-session-list" aria-label="Upcoming Beat81 workouts">
                 @for (session of visibleBeat81Sessions(); track session.id) {
                   <li class="session-item">
@@ -105,15 +98,7 @@
                 }
               </ul>
             </div>
-            @if (hasMoreBeat81Items()) {
-              <p class="next-step workouts-hint">
-                @if (workoutsExpanded()) {
-                  Expanded view - returns in 15s
-                } @else {
-                  Tap to expand workouts
-                }
-              </p>
-            }
+            <p class="next-step workouts-hint">Tap tile for expanded filters and full list.</p>
           }
         </div>
       }

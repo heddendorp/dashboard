@@ -69,6 +69,18 @@
   min-height: 0;
 }
 
+.board-main {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+
+.board-main > router-outlet + * {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
 @media (max-width: 1050px) {
   .board {
     grid-template-columns: 1fr;

@@ -1,0 +1,84 @@
+<section class="detail-panel" aria-labelledby="workouts-detail-title">
+  <header class="detail-header">
+    <button type="button" class="back-button" (click)="goBack()">Back</button>
+    <div>
+      <p class="widget-label">Beat81 workouts</p>
+      <h2 id="workouts-detail-title">Expanded workout view</h2>
+      <p class="detail-hint">Returns to dashboard after 15 seconds of inactivity.</p>
+    </div>
+  </header>
+
+  <div class="chip-row" role="group" aria-label="Workout filters">
+    <button
+      type="button"
+      class="chip-button"
+      [class.chip-button-active]="workdaysOnly()"
+      [attr.aria-pressed]="workdaysOnly()"
+      (click)="toggleWorkdaysOnly()"
+    >
+      Workdays
+    </button>
+    <button
+      type="button"
+      class="chip-button"
+      [class.chip-button-active]="eveningOnly()"
+      [attr.aria-pressed]="eveningOnly()"
+      (click)="toggleEveningOnly()"
+    >
+      18:30+
+    </button>
+    <button
+      type="button"
+      class="chip-button"
+      [class.chip-button-active]="minTwoSpotsOnly()"
+      [attr.aria-pressed]="minTwoSpotsOnly()"
+      (click)="toggleMinTwoSpotsOnly()"
+    >
+      2+ spots
+    </button>
+  </div>
+
+  @if (workoutsResource.isLoading()) {
+    <p class="next-step">Loading workout details…</p>
+  } @else if (errorMessage(); as error) {
+    <p class="next-step error-text">{{ error }}</p>
+    <button type="button" class="retry-button" (click)="workoutsResource.reload()">Retry</button>
+  } @else if (filteredWorkouts().length === 0) {
+    <p class="next-step">No workouts match the selected filters.</p>
+  } @else {
+    <div class="list-shell">
+      <ul class="session-list" aria-label="Detailed Beat81 workouts">
+        @for (workout of filteredWorkouts(); track workout.id) {
+          <li class="session-item">
+            @if (workout.trainerImageUrl) {
+              <img
+                [src]="workout.trainerImageUrl"
+                [alt]="workout.trainerName + ' profile photo'"
+                width="48"
+                height="48"
+                loading="lazy"
+                decoding="async"
+                referrerpolicy="no-referrer"
+              />
+            } @else {
+              <span class="session-avatar-fallback" aria-hidden="true">{{ workout.trainerInitials }}</span>
+            }
+
+            <div class="session-meta">
+              <div class="session-title-row">
+                <p class="session-title">{{ workout.title }}</p>
+                <span [class]="workout.openSpotsClass">{{ workout.openSpotsLabel }}</span>
+              </div>
+              <p class="session-detail">{{ workout.startsAtLabel }} · {{ workout.location }}</p>
+              <p class="session-detail">
+                {{ workout.trainerName }}
+                <span aria-hidden="true">·</span>
+                {{ workout.capacityLabel }}
+              </p>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+</section>

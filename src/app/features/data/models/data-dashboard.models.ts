@@ -40,3 +40,16 @@ export interface DataDashboardPayload {
   beat81Events: DataBeat81Event[];
   health: DataWidgetHealth[];
 }
+
+export interface DataCalendarEventsPayload {
+  items: DataCalendarEvent[];
+  count: number;
+  fetchedAt: string;
+}
+
+export interface DataBeat81EventsPayload {
+  items: DataBeat81Event[];
+  count: number;
+  sourceTotal: number | null;
+  fetchedAt: string;
+}

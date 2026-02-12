@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
 import type { WidgetShell } from '../../../../core/dashboard.models';
 import type {
@@ -9,6 +10,7 @@ import type {
   DataWidgetStatus
 } from '../../models/data-dashboard.models';
 import { DataDashboardService } from '../../services/data-dashboard.service';
+import { isBerlinWorkdayAtOrAfter } from '../../utils/berlin-workout-filter';
 
 interface DataStatusRow {
   label: string;
@@ -48,11 +50,12 @@ let dataColumnInstanceCounter = 0;
 export class DataColumnComponent {
   private readonly dataDashboardService = inject(DataDashboardService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
   private readonly autoRefreshIntervalMs = 5 * 60 * 1000;
+  private readonly workoutEveningCutoffMinutes = 18 * 60 + 30;
   private readonly collapsedCalendarLimit = 6;
   private readonly collapsedWorkoutLimit = 4;
   private autoRefreshTimer: ReturnType<typeof setInterval> | null = null;
-  private workoutsCollapseTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly instanceId = ++dataColumnInstanceCounter;
   private readonly calendarDateTimeFormatter = new Intl.DateTimeFormat('de-DE', {
     weekday: 'short',
@@ -76,7 +79,6 @@ export class DataColumnComponent {
   protected readonly dashboardResource = this.dataDashboardService.dashboardResource;
   protected readonly calendarEvents = this.dataDashboardService.calendarEvents;
   protected readonly beat81Events = this.dataDashboardService.beat81Events;
-  protected readonly workoutsExpanded = signal(false);
   protected readonly statusTitleId = `status-title-${this.instanceId}`;
 
   protected readonly widgets = signal<WidgetShell[]>([
@@ -102,6 +104,7 @@ export class DataColumnComponent {
 
   protected readonly beat81Sessions = computed<Beat81SessionRow[]>(() =>
     this.beat81Events()
+      .filter((event) => this.isVisibleDashboardWorkout(event))
       .map((event) => this.toSessionRow(event))
   );
   protected readonly calendarRows = computed<CalendarEventRow[]>(() =>
@@ -112,12 +115,7 @@ export class DataColumnComponent {
     this.calendarRows().slice(0, this.collapsedCalendarLimit)
   );
   protected readonly visibleBeat81Sessions = computed<Beat81SessionRow[]>(() =>
-    this.workoutsExpanded()
-      ? this.beat81Sessions()
-      : this.beat81Sessions().slice(0, this.collapsedWorkoutLimit)
-  );
-  protected readonly hasMoreBeat81Items = computed(
-    () => this.beat81Sessions().length > this.collapsedWorkoutLimit
+    this.beat81Sessions().slice(0, this.collapsedWorkoutLimit)
   );
 
   protected readonly dashboardErrorMessage = computed(() => {
@@ -160,22 +158,65 @@ export class DataColumnComponent {
   constructor() {
     this.startAutoRefresh();
     this.destroyRef.onDestroy(() => {
-      this.clearWorkoutsCollapseTimer();
       this.clearAutoRefreshTimer();
     });
   }
 
-  protected expandWorkoutsTemporarily(): void {
-    if (!this.hasMoreBeat81Items()) {
+  protected isWidgetExpandable(widgetId: WidgetShell['id']): boolean {
+    return widgetId === 'calendar' || widgetId === 'workouts';
+  }
+
+  protected onWidgetClick(widgetId: WidgetShell['id'], event: MouseEvent): void {
+    if (!this.isWidgetExpandable(widgetId)) {
       return;
     }
 
-    this.workoutsExpanded.set(true);
-    this.clearWorkoutsCollapseTimer();
-    this.workoutsCollapseTimer = setTimeout(() => {
-      this.workoutsExpanded.set(false);
-      this.workoutsCollapseTimer = null;
-    }, 15_000);
+    if (this.isNestedInteractiveTarget(event.target, event.currentTarget)) {
+      return;
+    }
+
+    this.navigateToWidget(widgetId);
+  }
+
+  protected onWidgetKeydown(widgetId: WidgetShell['id'], event: KeyboardEvent): void {
+    if (!this.isWidgetExpandable(widgetId)) {
+      return;
+    }
+
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+
+    if (this.isNestedInteractiveTarget(event.target, event.currentTarget)) {
+      return;
+    }
+
+    event.preventDefault();
+    this.navigateToWidget(widgetId);
+  }
+
+  protected widgetTransitionName(widgetId: WidgetShell['id']): string | null {
+    if (widgetId === 'calendar') {
+      return 'calendar-tile';
+    }
+
+    if (widgetId === 'workouts') {
+      return 'workouts-tile';
+    }
+
+    return null;
+  }
+
+  protected widgetAriaLabel(widget: WidgetShell): string {
+    if (widget.id === 'calendar') {
+      return 'Calendar, tap to open detailed view';
+    }
+
+    if (widget.id === 'workouts') {
+      return 'Beat81 workouts, tap to open detailed view';
+    }
+
+    return widget.title;
   }
 
   private widgetLabel(health: DataWidgetHealth): string {
@@ -231,15 +272,6 @@ export class DataColumnComponent {
     }
 
     return { label: `${openSpots} left`, className: 'spot-chip spots-open' };
-  }
-
-  private clearWorkoutsCollapseTimer(): void {
-    if (this.workoutsCollapseTimer === null) {
-      return;
-    }
-
-    clearTimeout(this.workoutsCollapseTimer);
-    this.workoutsCollapseTimer = null;
   }
 
   private startAutoRefresh(): void {
@@ -337,5 +369,27 @@ export class DataColumnComponent {
       'message' in value &&
       typeof value.message === 'string'
     );
+  }
+
+  private isVisibleDashboardWorkout(event: DataBeat81Event): boolean {
+    if (event.openSpots === null || event.openSpots < 2) {
+      return false;
+    }
+
+    return isBerlinWorkdayAtOrAfter(event.startsAt, this.workoutEveningCutoffMinutes);
+  }
+
+  private navigateToWidget(widgetId: WidgetShell['id']): void {
+    const route = widgetId === 'calendar' ? '/calendar' : '/workouts';
+    void this.router.navigateByUrl(route);
+  }
+
+  private isNestedInteractiveTarget(target: EventTarget | null, currentTarget: EventTarget | null): boolean {
+    if (!(target instanceof Element) || !(currentTarget instanceof Element)) {
+      return false;
+    }
+
+    const interactiveAncestor = target.closest('a, button, input, select, textarea, [role="button"]');
+    return Boolean(interactiveAncestor && interactiveAncestor !== currentTarget);
   }
 }

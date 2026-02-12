@@ -19,7 +19,16 @@ function decodeBasicAuthorization(headerValue: string): { username: string; pass
   };
 }
 
+function isBasicAuthDisabled(): boolean {
+  const value = process.env['BASIC_AUTH_DISABLED']?.trim().toLowerCase();
+  return value === '1' || value === 'true' || value === 'yes';
+}
+
 export function isAuthorizedRequest(req: ApiRequest): boolean {
+  if (isBasicAuthDisabled()) {
+    return true;
+  }
+
   const expectedUsername = process.env['BASIC_AUTH_USER'];
   const expectedPassword = process.env['BASIC_AUTH_PASS'];
 

@@ -19,7 +19,7 @@ aside {
   background: linear-gradient(180deg, rgb(232 247 236 / 0.95), rgb(216 240 223 / 0.95));
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.35rem;
   padding: 1rem;
 }
 
@@ -41,10 +41,14 @@ aside {
 .frog-sprite {
   --frog-frame-size: 48px;
   --frog-scale: 5;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   margin: 0;
-  margin-top: 0.25rem;
   display: grid;
   justify-items: center;
+  z-index: 1;
 }
 
 .frog-scene {
@@ -141,8 +145,6 @@ aside {
   top: 0.75rem;
   width: 2.6rem;
   height: 2.6rem;
-  display: block;
-  overflow: visible;
   pointer-events: none;
   z-index: 1;
 }
@@ -154,11 +156,7 @@ aside {
   object-fit: contain;
 }
 
-.frog-celestial-image-sun {
-  transform: scale(2.0834);
-  transform-origin: center;
-}
-
+.frog-celestial-image-sun,
 .frog-celestial-image-moon {
   transform: scale(2.0834);
   transform-origin: center;
@@ -286,13 +284,9 @@ aside {
   width: calc(var(--frog-frame-size) * var(--frog-scale));
   height: calc(var(--frog-frame-size) * var(--frog-scale));
   position: relative;
-  display: block;
   overflow: hidden;
   transform: scaleX(-1);
   z-index: 3;
-}
-
-.frog-sprite-viewport.jump-ready {
   cursor: pointer;
 }
 
@@ -436,6 +430,14 @@ h2 {
   display: grid;
   gap: 0.45rem;
   justify-items: center;
+}
+
+.frog-controls {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 7.3rem);
+  transform: translateX(-50%);
+  z-index: 5;
 }
 
 .feed-button:focus-visible {

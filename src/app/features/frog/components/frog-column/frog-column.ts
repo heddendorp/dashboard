@@ -53,8 +53,10 @@ type GroundSeasonClass =
   }
 })
 export class FrogColumnComponent implements OnDestroy {
+  protected readonly titleId = 'frog-title';
   protected readonly isAttacking = signal(false);
   protected readonly isJumping = signal(false);
+  protected readonly isPreviewHopping = signal(false);
   protected readonly isHitHurt = signal(false);
   protected readonly isGameMode = signal(false);
   protected readonly obstacles = signal<Obstacle[]>([]);
@@ -87,6 +89,7 @@ export class FrogColumnComponent implements OnDestroy {
   private happinessDecayTimeout: ReturnType<typeof setTimeout> | null = null;
   private clockTimeout: ReturnType<typeof setTimeout> | null = null;
   private jumpTimeout: ReturnType<typeof setTimeout> | null = null;
+  private previewHopTimeout: ReturnType<typeof setTimeout> | null = null;
   private hitHurtTimeout: ReturnType<typeof setTimeout> | null = null;
   private gameTimeouts: Array<ReturnType<typeof setTimeout>> = [];
   private gameEndTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -154,11 +157,30 @@ export class FrogColumnComponent implements OnDestroy {
     }, JUMP_CYCLE_MS);
   }
 
+  protected onFrogClick(): void {
+    if (this.isGameMode()) {
+      this.jumpToad();
+      return;
+    }
+
+    if (this.isAttacking() || this.isPreviewHopping()) {
+      return;
+    }
+
+    this.clearPreviewHopTimeout();
+    this.isPreviewHopping.set(true);
+    this.previewHopTimeout = setTimeout(() => {
+      this.isPreviewHopping.set(false);
+      this.previewHopTimeout = null;
+    }, JUMP_CYCLE_MS);
+  }
+
   ngOnDestroy(): void {
     this.clearFeedTimeout();
     this.clearHappinessDecayTimeout();
     this.clearClockTimeout();
     this.clearJumpTimeout();
+    this.clearPreviewHopTimeout();
     this.clearHitHurtTimeout();
     this.clearGameTimeouts();
     this.clearGameEndTimeout();
@@ -347,6 +369,13 @@ export class FrogColumnComponent implements OnDestroy {
     if (this.jumpTimeout !== null) {
       clearTimeout(this.jumpTimeout);
       this.jumpTimeout = null;
+    }
+  }
+
+  private clearPreviewHopTimeout(): void {
+    if (this.previewHopTimeout !== null) {
+      clearTimeout(this.previewHopTimeout);
+      this.previewHopTimeout = null;
     }
   }
 

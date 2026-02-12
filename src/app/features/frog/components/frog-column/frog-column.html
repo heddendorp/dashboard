@@ -1,5 +1,5 @@
 <aside [attr.aria-labelledby]="titleId">
-  <div class="frog-panel">
+  <div class="frog-panel" [class.game-mode]="isGameMode()">
     @if (isGameMode()) {
       <button
         type="button"
@@ -59,12 +59,26 @@
             }
           </div>
         }
-        <div class="frog-sprite-viewport" [class.jump-ready]="isGameMode()" (click)="jumpToad()">
+        <div
+          class="frog-sprite-viewport"
+          [class.jump-ready]="isGameMode()"
+          [class.preview-hop-ready]="!isGameMode()"
+          (click)="onFrogClick()"
+        >
           @if (isAttacking()) {
             <img
               class="frog-sprite-strip frog-sprite-strip-attack"
               ngSrc="/frog/GreenBlue/ToxicFrogGreenBlue_Attack.png"
               width="288"
+              height="48"
+              alt="Animierter Frosch"
+              priority
+            />
+          } @else if (isPreviewHopping()) {
+            <img
+              class="frog-sprite-strip frog-sprite-strip-hop"
+              ngSrc="/frog/GreenBlue/ToxicFrogGreenBlue_Hop.png"
+              width="336"
               height="48"
               alt="Animierter Frosch"
               priority
@@ -118,16 +132,18 @@
         </div>
       </div>
     </figure>
-    @if (isGameMode()) {
-      <button type="button" class="feed-button jump-button" (click)="jumpToad()">Jump</button>
-    } @else {
-      <div class="frog-actions">
-        <button type="button" class="feed-button" [disabled]="isAttacking()" (click)="feedToad()">
-          Feed
-        </button>
-        <button type="button" class="feed-button play-button" (click)="startGameMode()">Play</button>
-      </div>
-    }
+    <div class="frog-controls">
+      @if (isGameMode()) {
+        <button type="button" class="feed-button jump-button" (click)="jumpToad()">Jump</button>
+      } @else {
+        <div class="frog-actions">
+          <button type="button" class="feed-button" [disabled]="isAttacking()" (click)="feedToad()">
+            Feed
+          </button>
+          <button type="button" class="feed-button play-button" (click)="startGameMode()">Play</button>
+        </div>
+      }
+    </div>
     <div class="happiness">
       <div class="happiness-header">
         <span id="happiness-label">Happiness</span>

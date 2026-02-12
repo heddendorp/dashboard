@@ -22,6 +22,294 @@ aside {
   padding: 1rem;
 }
 
+.frog-sprite {
+  --frog-frame-size: 48px;
+  --frog-scale: 5;
+  margin: 0;
+  margin-top: 0.25rem;
+  display: grid;
+  justify-items: center;
+}
+
+.frog-scene {
+  position: relative;
+  display: grid;
+  place-items: end center;
+  width: calc(var(--frog-frame-size) * var(--frog-scale));
+  padding-bottom: 0;
+}
+
+.frog-ground {
+  --grass-a: #7fbb58;
+  --grass-b: #6cad4a;
+  --grass-c: #8ec764;
+  --grass-top: #91cb65;
+  --grass-bottom: #5f9441;
+  --grass-border: rgb(39 87 47 / 0.45);
+  --grass-shine: rgb(191 236 146 / 0.45);
+  position: absolute;
+  left: 50%;
+  bottom: 2.7rem;
+  width: calc(var(--frog-frame-size) * var(--frog-scale) + 2.75rem);
+  height: 2rem;
+  transform: translateX(-50%);
+  border-radius: 0.35rem;
+  border: 1px solid var(--grass-border);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--grass-a) 0 10px,
+      var(--grass-b) 10px 20px,
+      var(--grass-c) 20px 30px
+    ),
+    linear-gradient(180deg, var(--grass-top) 0%, var(--grass-bottom) 100%);
+  box-shadow: inset 0 2px 0 var(--grass-shine);
+  image-rendering: pixelated;
+  z-index: 0;
+}
+
+.frog-ground-winter {
+  --grass-a: #7da06f;
+  --grass-b: #709060;
+  --grass-c: #8cad80;
+  --grass-top: #93b685;
+  --grass-bottom: #66835a;
+  --grass-border: rgb(64 92 58 / 0.45);
+  --grass-shine: rgb(206 226 196 / 0.35);
+}
+
+.frog-ground-spring {
+  --grass-a: #9bd66b;
+  --grass-b: #8ccc5e;
+  --grass-c: #a9df78;
+  --grass-top: #b5e684;
+  --grass-bottom: #72b34f;
+  --grass-border: rgb(64 120 54 / 0.45);
+  --grass-shine: rgb(222 248 183 / 0.45);
+}
+
+.frog-ground-summer {
+  --grass-a: #5fae45;
+  --grass-b: #4f9938;
+  --grass-c: #6dbb51;
+  --grass-top: #78c45a;
+  --grass-bottom: #3f7f2d;
+  --grass-border: rgb(33 78 32 / 0.5);
+  --grass-shine: rgb(166 220 120 / 0.38);
+}
+
+.frog-ground-autumn {
+  --grass-a: #7f9b4f;
+  --grass-b: #6f8745;
+  --grass-c: #8ca95b;
+  --grass-top: #98ae68;
+  --grass-bottom: #6b7242;
+  --grass-border: rgb(81 77 45 / 0.45);
+  --grass-shine: rgb(206 200 146 / 0.35);
+}
+
+.frog-food {
+  position: absolute;
+  left: -110px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 222px;
+  height: 125px;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.frog-celestial {
+  position: absolute;
+  right: -1.35rem;
+  top: 0.75rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.frog-celestial-image {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+
+.frog-celestial-image-sun {
+  transform: scale(2.0834);
+  transform-origin: center;
+}
+
+.frog-celestial-image-moon {
+  transform: scale(2.0834);
+  transform-origin: center;
+}
+
+.frog-flower {
+  --flower-petal-color: #fff;
+  --flower-center-color: #ffd966;
+  --flower-stem-a: #66a34a;
+  --flower-stem-b: #5a9042;
+  position: absolute;
+  right: -2.35rem;
+  bottom: 4.2rem;
+  width: 5.45rem;
+  height: 5.45rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.frog-flower::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0.75rem;
+  height: 2.4rem;
+  transform: translateX(-50%);
+  background:
+    repeating-linear-gradient(180deg, var(--flower-stem-a) 0 8px, var(--flower-stem-b) 8px 16px);
+  image-rendering: pixelated;
+}
+
+.frog-flower-winter {
+  --flower-petal-color: #fff;
+  --flower-center-color: #ffd966;
+  --flower-stem-a: #76a85f;
+  --flower-stem-b: #688f54;
+}
+
+.frog-flower-spring {
+  --flower-petal-color: #f7b4d6;
+  --flower-center-color: #ffe0ef;
+  --flower-stem-a: #79be57;
+  --flower-stem-b: #66a047;
+}
+
+.frog-flower-summer {
+  --flower-petal-color: #f6d95c;
+  --flower-center-color: #7f5b2b;
+  --flower-stem-a: #5ea344;
+  --flower-stem-b: #4f8a37;
+}
+
+.frog-flower-autumn {
+  --flower-petal-color: #d84a4a;
+  --flower-center-color: #ffc66d;
+  --flower-stem-a: #718a45;
+  --flower-stem-b: #61743b;
+}
+
+.frog-flower::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0.4rem;
+  width: 1.45rem;
+  height: 1.45rem;
+  transform: translateX(-50%);
+  border-radius: 0.2rem;
+  background: var(--flower-center-color);
+  box-shadow:
+    0 -1.1rem 0 0 var(--flower-petal-color),
+    0 1.1rem 0 0 var(--flower-petal-color),
+    -1.1rem 0 0 0 var(--flower-petal-color),
+    1.1rem 0 0 0 var(--flower-petal-color),
+    -0.75rem -0.75rem 0 0 var(--flower-petal-color),
+    0.75rem -0.75rem 0 0 var(--flower-petal-color),
+    -0.75rem 0.75rem 0 0 var(--flower-petal-color),
+    0.75rem 0.75rem 0 0 var(--flower-petal-color);
+  image-rendering: pixelated;
+}
+
+.frog-sprite-viewport {
+  width: calc(var(--frog-frame-size) * var(--frog-scale));
+  height: calc(var(--frog-frame-size) * var(--frog-scale));
+  position: relative;
+  display: block;
+  overflow: hidden;
+  transform: scaleX(-1);
+  z-index: 1;
+}
+
+.frog-sprite-strip {
+  display: block;
+  width: calc(384px * var(--frog-scale));
+  height: calc(var(--frog-frame-size) * var(--frog-scale));
+  max-width: none;
+  transform-origin: left top;
+  image-rendering: pixelated;
+  will-change: transform;
+}
+
+.frog-sprite-strip-idle {
+  animation: frog-idle-frames 1s steps(7, end) infinite;
+}
+
+.frog-sprite-strip-attack {
+  width: calc(288px * var(--frog-scale));
+  animation: frog-attack-frames 1s steps(5, end) 1;
+}
+
+.frog-sprite-strip-hurt {
+  width: calc(192px * var(--frog-scale));
+  animation: frog-hurt-frames 1s steps(3, end) infinite;
+}
+
+.frog-sprite-strip-explosion {
+  width: calc(432px * var(--frog-scale));
+  animation: frog-explosion-frames 1s steps(8, end) infinite;
+}
+
+@keyframes frog-idle-frames {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-336px * var(--frog-scale)));
+  }
+}
+
+@keyframes frog-attack-frames {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-240px * var(--frog-scale)));
+  }
+}
+
+@keyframes frog-hurt-frames {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-144px * var(--frog-scale)));
+  }
+}
+
+@keyframes frog-explosion-frames {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-384px * var(--frog-scale)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frog-sprite-strip {
+    animation: none;
+  }
+}
+
 .widget-label {
   margin: 0;
   text-transform: uppercase;
@@ -35,23 +323,60 @@ h2 {
   color: var(--ink-strong);
 }
 
-p {
-  margin: 0;
-  color: var(--ink);
-}
-
-button {
-  margin-top: auto;
-  border-radius: 0.7rem;
-  border: 1px solid rgb(77 103 80 / 0.4);
-  background: rgb(255 255 255 / 0.8);
-  color: rgb(64 87 66);
-  padding: 0.65rem 0.75rem;
+.feed-button {
+  min-width: 7.25rem;
+  margin: 0 auto;
+  border-radius: 0.65rem;
+  border: 1px solid rgb(77 103 80 / 0.45);
+  background: rgb(255 255 255 / 0.88);
+  color: rgb(48 70 52);
   font: inherit;
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
 }
 
-button:disabled {
-  opacity: 1;
+.feed-button:focus-visible {
+  outline: 2px solid rgb(48 70 52);
+  outline-offset: 2px;
+}
+
+.feed-button:disabled {
+  opacity: 0.75;
+  cursor: default;
+}
+
+.happiness {
+  margin-top: auto;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.happiness-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.88rem;
+  color: var(--ink-strong);
+}
+
+.happiness progress {
+  width: 100%;
+  height: 0.8rem;
+}
+
+.happiness progress::-webkit-progress-bar {
+  background: rgb(255 255 255 / 0.85);
+  border-radius: 999px;
+}
+
+.happiness progress::-webkit-progress-value {
+  background: linear-gradient(90deg, #4f8f5b, #80b069);
+  border-radius: 999px;
+}
+
+.happiness progress::-moz-progress-bar {
+  background: linear-gradient(90deg, #4f8f5b, #80b069);
+  border-radius: 999px;
 }
 
 @media (max-width: 1050px) {

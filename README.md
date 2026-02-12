@@ -1,59 +1,127 @@
-# Dashboard
+# Hallway Dashboard
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.4.
+Smart always-on hallway dashboard built with Angular 21, signals, Tailwind CSS, and a Vercel backend function for private API access.
 
-## Development server
+## Current Status
+- Stage 1 baseline is implemented.
+- Frontend layout is ready and split into isolated feature areas.
+- Backend API skeleton exists with auth + placeholder data contracts.
+- Stage 2 (frog) and Stage 3 (data management) are planned and documented.
 
-To start a local development server, run:
+## Architecture
+- Frontend: static Angular app.
+- Backend: single Vercel function at `api/[[...route]].ts`.
+- Auth: Basic auth for all `/api/*` routes.
+- Data (current): placeholder responses.
+- Data (planned): Google Calendar, Beat81 adapter, shopping persistence via Vercel-managed KV.
 
-```bash
-ng serve
+## Tech Stack
+- Angular 21
+- TypeScript (strict)
+- Tailwind CSS v4
+- Vercel serverless function (Node 22 runtime)
+
+## Repository Structure
+```text
+src/app/
+  core/
+    dashboard.models.ts
+  features/
+    data/
+      components/data-column/
+      models/
+      services/
+    frog/
+      components/frog-column/
+      state/
+      assets/
+api/
+  [[...route]].ts
+  auth.ts
+  routes.ts
+  types.ts
+  adapters/
+  contracts/
+docs/
+  implementation-plan.md
+  runbooks/
+    parallel-work-map.md
+    stage-2-frog.md
+    stage-3-data-management.md
+public/
+  frog/
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+## Getting Started
+1. Install dependencies:
 ```bash
-ng generate component component-name
+npm install
+```
+2. Start frontend dev server:
+```bash
+npm start
+```
+3. Build production bundle:
+```bash
+npm run build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Backend API (Current)
+All routes require Basic auth.
 
-```bash
-ng generate --help
-```
+### Environment Variables
+Required now:
+- `BASIC_AUTH_USER`
+- `BASIC_AUTH_PASS`
 
-## Building
+Planned for Stage 3:
+- `GOOGLE_SERVICE_ACCOUNT_JSON`
+- `GOOGLE_CALENDAR_ID`
+- KV credentials from Vercel-managed KV
+- Beat81 adapter credentials/settings
 
-To build the project run:
+### Routes
+- `GET /api/health`
+  - Returns service status payload.
+- `GET /api/dashboard`
+  - Returns placeholder `DashboardPayload` with widget health.
+- `GET /api/shopping`
+  - Returns empty list placeholder.
+- `POST /api/shopping`
+- `PATCH /api/shopping/:id`
+- `DELETE /api/shopping/:id`
+  - Currently `501 not_implemented` (reserved for Stage 3).
 
-```bash
-ng build
-```
+## UI Component Boundaries
+To reduce merge conflicts in parallel work:
+- `src/app/features/frog/**` is Stage 2 owned.
+- `src/app/features/data/**` is Stage 3 owned.
+- `api/adapters/**` and `api/contracts/**` are Stage 3 owned.
+- Shared files (`src/app/app.ts`, `src/app/app.html`, `api/types.ts`, `api/routes.ts`) should only receive narrow, explicit contract changes.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Parallel Branch Workflow
+Baseline branch:
+- `codex/stage1-basics`
 
-## Running unit tests
+Parallel branches:
+- `codex/stage2-frog`
+- `codex/stage3-data`
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Detailed process:
+- `docs/runbooks/parallel-work-map.md`
 
-```bash
-ng test
-```
+## Planning Docs
+- Master plan: `docs/implementation-plan.md`
+- Frog runbook: `docs/runbooks/stage-2-frog.md`
+- Data runbook: `docs/runbooks/stage-3-data-management.md`
+- Parallel merge/conflict rules: `docs/runbooks/parallel-work-map.md`
 
-## Running end-to-end tests
+## Vercel Deployment Notes
+- `vercel.json` configures Angular framework deployment and Node 22 runtime for `api/[[...route]].ts`.
+- Frontend build output is generated under `dist/dashboard/browser`.
+- Production currently expects auto-deploy from `main`.
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Development Guidelines
+- Prefer Angular CLI generators for new components/services.
+- Keep changes scoped to owned feature directories when working in parallel branches.
+- Update runbook docs when changing shared contracts.

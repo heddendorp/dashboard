@@ -1,5 +1,15 @@
 <aside [attr.aria-labelledby]="titleId">
-  <div class="frog-panel">
+  <div class="frog-panel" [class.game-mode]="isGameMode()">
+    @if (isGameMode()) {
+      <button
+        type="button"
+        class="game-back-button"
+        (click)="exitGameMode()"
+        aria-label="Spielmodus verlassen"
+      >
+        ←
+      </button>
+    }
     <p class="widget-label">frog area</p>
     <h2 id="frog-title">Little Toad</h2>
     <figure class="frog-sprite">
@@ -37,7 +47,24 @@
         </div>
         <div [class]="'frog-flower ' + flowerSeasonClass()" aria-hidden="true"></div>
         <div [class]="'frog-ground ' + groundSeasonClass()" aria-hidden="true"></div>
-        <div class="frog-sprite-viewport">
+        @if (isGameMode()) {
+          <div class="frog-obstacle-lane" [class.obstacles-under]="isJumping()" aria-hidden="true">
+            @for (obstacle of obstacles(); track obstacle.id) {
+              <span
+                class="frog-obstacle"
+                [style.animation-delay.ms]="obstacle.delayMs"
+                [style.animation-duration.ms]="obstacleTravelMs"
+                [class.frog-obstacle-resolved]="obstacle.resolved"
+              ></span>
+            }
+          </div>
+        }
+        <div
+          class="frog-sprite-viewport"
+          [class.jump-ready]="isGameMode()"
+          [class.preview-hop-ready]="!isGameMode()"
+          (click)="onFrogClick()"
+        >
           @if (isAttacking()) {
             <img
               class="frog-sprite-strip frog-sprite-strip-attack"
@@ -47,7 +74,34 @@
               alt="Animierter Frosch"
               priority
             />
-          } @else if (isExploding()) {
+          } @else if (isPreviewHopping()) {
+            <img
+              class="frog-sprite-strip frog-sprite-strip-hop"
+              ngSrc="/frog/GreenBlue/ToxicFrogGreenBlue_Hop.png"
+              width="336"
+              height="48"
+              alt="Animierter Frosch"
+              priority
+            />
+          } @else if (isJumping()) {
+            <img
+              class="frog-sprite-strip frog-sprite-strip-hop"
+              ngSrc="/frog/GreenBlue/ToxicFrogGreenBlue_Hop.png"
+              width="336"
+              height="48"
+              alt="Animierter Frosch"
+              priority
+            />
+          } @else if (isHitHurt()) {
+            <img
+              class="frog-sprite-strip frog-sprite-strip-hit-hurt"
+              ngSrc="/frog/GreenBlue/ToxicFrogGreenBlue_Hurt.png"
+              width="192"
+              height="48"
+              alt="Animierter Frosch"
+              priority
+            />
+          } @else if (showBaseExplosion()) {
             <img
               class="frog-sprite-strip frog-sprite-strip-explosion"
               ngSrc="/frog/GreenBlue/ToxicFrogGreenBlue_Explosion.png"
@@ -56,7 +110,7 @@
               alt="Animierter Frosch"
               priority
             />
-          } @else if (isHurt()) {
+          } @else if (showBaseHurt()) {
             <img
               class="frog-sprite-strip frog-sprite-strip-hurt"
               ngSrc="/frog/GreenBlue/ToxicFrogGreenBlue_Hurt.png"
@@ -78,9 +132,18 @@
         </div>
       </div>
     </figure>
-    <button type="button" class="feed-button" [disabled]="isAttacking()" (click)="feedToad()">
-      Feed
-    </button>
+    <div class="frog-controls">
+      @if (isGameMode()) {
+        <button type="button" class="feed-button jump-button" (click)="jumpToad()">Jump</button>
+      } @else {
+        <div class="frog-actions">
+          <button type="button" class="feed-button" [disabled]="isAttacking()" (click)="feedToad()">
+            Feed
+          </button>
+          <button type="button" class="feed-button play-button" (click)="startGameMode()">Play</button>
+        </div>
+      }
+    </div>
     <div class="happiness">
       <div class="happiness-header">
         <span id="happiness-label">Happiness</span>

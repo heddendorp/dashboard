@@ -1,3 +1,3 @@
-# Calendar Adapter Slot
+# Calendar Adapter
 
-Implement Google Calendar integration here in Stage 3.
+Google Calendar integration is implemented in `google-calendar.ts` using a service-account JWT flow.

@@ -1,7 +1,7 @@
-<aside aria-labelledby="frog-title">
+<aside [attr.aria-labelledby]="titleId">
   <div class="frog-panel">
     <p class="widget-label">frog area</p>
-    <h2 id="frog-title">Interactive Frog Reserved</h2>
+    <h2 [id]="titleId">Interactive Frog Reserved</h2>
     <p>
       This panel is fixed to the right third so Stage 2 can add sprite states and touch interactions
       without changing the main layout.

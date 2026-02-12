@@ -190,7 +190,7 @@ export async function fetchBeat81Events(options: Beat81EventsOptions = {}): Prom
     'accept-language': resolveLanguage(options.language)
   };
   if (token) {
-    headers.authorization = `Bearer ${token}`;
+    headers['authorization'] = `Bearer ${token}`;
   }
 
   const response = await fetch(url, { method: 'GET', headers });

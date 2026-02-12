@@ -41,6 +41,7 @@ let frogColumnInstanceCounter = 0;
   }
 })
 export class FrogColumnComponent implements OnDestroy {
+  protected readonly titleId = `frog-title-${frogColumnInstanceCounter++}`;
   protected readonly isAttacking = signal(false);
   protected readonly happiness = signal(82);
   protected readonly showFood = signal(false);

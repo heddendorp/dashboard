@@ -16,7 +16,13 @@ aside {
   border: 1px solid var(--panel-stroke);
   height: 100%;
   min-height: 0;
-  background: linear-gradient(180deg, rgb(232 247 236 / 0.95), rgb(216 240 223 / 0.95));
+  background: linear-gradient(
+    180deg,
+    rgb(222 240 252 / 0.95) 0%,
+    rgb(210 232 248 / 0.95) 58.5%,
+    rgb(220 205 173 / 0.95) 58.5%,
+    rgb(206 189 156 / 0.95) 100%
+  );
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -26,7 +32,7 @@ aside {
 .game-back-button {
   position: absolute;
   top: 0.7rem;
-  left: 0.7rem;
+  right: 0.7rem;
   width: 2rem;
   height: 2rem;
   border-radius: 0.45rem;
@@ -44,6 +50,7 @@ aside {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 100%;
   transform: translate(-50%, -50%);
   margin: 0;
   display: grid;
@@ -55,7 +62,7 @@ aside {
   position: relative;
   display: grid;
   place-items: end center;
-  width: calc(var(--frog-frame-size) * var(--frog-scale));
+  width: 100%;
   padding-bottom: 0;
 }
 
@@ -68,22 +75,20 @@ aside {
   --grass-border: rgb(39 87 47 / 0.45);
   --grass-shine: rgb(191 236 146 / 0.45);
   position: absolute;
-  left: 50%;
+  left: 0;
+  right: 0;
   bottom: 2.7rem;
-  width: calc(var(--frog-frame-size) * var(--frog-scale) + 2.75rem);
+  width: auto;
   height: 2rem;
-  transform: translateX(-50%);
-  border-radius: 0.35rem;
-  border: 1px solid var(--grass-border);
-  background:
-    repeating-linear-gradient(
-      90deg,
-      var(--grass-a) 0 10px,
-      var(--grass-b) 10px 20px,
-      var(--grass-c) 20px 30px
-    ),
-    linear-gradient(180deg, var(--grass-top) 0%, var(--grass-bottom) 100%);
-  box-shadow: inset 0 2px 0 var(--grass-shine);
+  border-radius: 0;
+  border: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--grass-a) 0 10px,
+    var(--grass-b) 10px 20px,
+    var(--grass-c) 20px 30px
+  );
+  box-shadow: none;
   image-rendering: pixelated;
   z-index: 0;
 }
@@ -141,7 +146,7 @@ aside {
 
 .frog-celestial {
   position: absolute;
-  right: -1.35rem;
+  right: 1.2rem;
   top: 0.75rem;
   width: 2.6rem;
   height: 2.6rem;
@@ -168,7 +173,7 @@ aside {
   --flower-stem-a: #66a34a;
   --flower-stem-b: #5a9042;
   position: absolute;
-  right: -2.35rem;
+  right: 0.85rem;
   bottom: 4.2rem;
   width: 5.45rem;
   height: 5.45rem;
@@ -244,7 +249,9 @@ aside {
   left: 0;
   right: 0;
   bottom: 4.55rem;
+  width: auto;
   height: 1.2rem;
+  overflow: hidden;
   z-index: 4;
   pointer-events: none;
 }
@@ -254,10 +261,11 @@ aside {
 }
 
 .frog-obstacle {
+  --frog-obstacle-width: 1.33rem;
   position: absolute;
-  left: -1.25rem;
+  left: 0;
   bottom: 0;
-  width: 1.33rem;
+  width: var(--frog-obstacle-width);
   height: 0.62rem;
   border-radius: 0.25rem 0.2rem 0.22rem 0.3rem;
   background: linear-gradient(180deg, #94989d 0%, #7f868c 60%, #6f767d 100%);
@@ -265,7 +273,7 @@ aside {
   box-shadow: inset 0 1px 0 rgb(212 216 220 / 0.45);
   opacity: 0;
   animation-name: frog-obstacle-run;
-  animation-timing-function: cubic-bezier(0.7, 0, 0.25, 1);
+  animation-timing-function: linear;
   animation-fill-mode: none;
 }
 
@@ -331,7 +339,7 @@ aside {
 
 @keyframes frog-obstacle-run {
   0% {
-    left: -1.25rem;
+    left: 0;
     opacity: 1;
   }
 
@@ -340,7 +348,7 @@ aside {
   }
 
   100% {
-    left: calc(200% + 1.2rem);
+    left: calc(100% - var(--frog-obstacle-width));
     opacity: 0;
   }
 }
@@ -427,9 +435,13 @@ h2 {
 }
 
 .frog-actions {
-  display: grid;
-  gap: 0.45rem;
-  justify-items: center;
+  display: flex;
+  gap: 0.65rem;
+  justify-content: center;
+}
+
+.frog-actions .feed-button {
+  margin: 0;
 }
 
 .frog-controls {

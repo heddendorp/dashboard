@@ -8,6 +8,16 @@ import {
   inject,
   signal
 } from '@angular/core';
+import * as SunCalc from 'suncalc';
+
+import {
+  CelestialPosition,
+  SkyPhase,
+  frameIndexToBackgroundPosition,
+  moonPhaseToFrameIndex,
+  resolveSkyPhase,
+  toCelestialPosition
+} from './frog-sky.logic';
 
 const ATTACK_CYCLE_MS = 1000;
 const JUMP_CYCLE_MS = 1000;
@@ -16,15 +26,17 @@ const JUMP_UNSAFE_START_RATIO = 0.2;
 const JUMP_UNSAFE_END_RATIO = 0.8;
 const HAPPINESS_DECAY_STEP = 10;
 const HAPPINESS_DECAY_INTERVAL_MS = 2 * 60 * 60 * 1000;
-const CLOCK_UPDATE_INTERVAL_MINUTES = 5;
+const CLOCK_UPDATE_INTERVAL_MINUTES = 1;
+const BACKGROUND_TRANSITION_MS = 120_000;
+const FROG_LATITUDE = 48 + 8 / 60;
+const FROG_LONGITUDE = 11 + 34 / 60;
 const QUIET_HOURS_START_MINUTES = 22 * 60;
 const QUIET_HOURS_END_MINUTES = 7 * 60 + 30;
-const DAYTIME_START_MINUTES = 7 * 60 + 30;
-const DAYTIME_END_MINUTES = 20 * 60;
 const OBSTACLE_COUNT = 20;
 const OBSTACLE_INTERVAL_MS = 3734;
 const OBSTACLE_TRAVEL_MS = 2700;
 const OBSTACLE_COLLISION_CHECK_RATIO = 0.4;
+const SKY_GROUND_SPLIT_PERCENT = 58.5;
 
 type Obstacle = {
   id: number;
@@ -41,6 +53,51 @@ type GroundSeasonClass =
   | 'frog-ground-spring'
   | 'frog-ground-summer'
   | 'frog-ground-autumn';
+
+const PANEL_GRADIENTS_BY_PHASE: Record<SkyPhase, string> = {
+  night: createPanelGradient(
+    'rgb(31 44 79 / 0.96)',
+    'rgb(56 68 102 / 0.96)',
+    'rgb(98 87 72 / 0.96)',
+    'rgb(84 75 62 / 0.96)'
+  ),
+  dawn: createPanelGradient(
+    'rgb(113 137 188 / 0.96)',
+    'rgb(168 176 210 / 0.96)',
+    'rgb(205 185 156 / 0.96)',
+    'rgb(187 168 141 / 0.96)'
+  ),
+  sunrise: createPanelGradient(
+    'rgb(255 193 162 / 0.96)',
+    'rgb(247 170 162 / 0.96)',
+    'rgb(225 204 172 / 0.96)',
+    'rgb(207 186 155 / 0.96)'
+  ),
+  day: createPanelGradient(
+    'rgb(222 240 252 / 0.95)',
+    'rgb(210 232 248 / 0.95)',
+    'rgb(220 205 173 / 0.95)',
+    'rgb(206 189 156 / 0.95)'
+  ),
+  goldenHour: createPanelGradient(
+    'rgb(189 220 244 / 0.96)',
+    'rgb(249 213 152 / 0.96)',
+    'rgb(226 205 165 / 0.96)',
+    'rgb(209 187 149 / 0.96)'
+  ),
+  sunset: createPanelGradient(
+    'rgb(238 150 115 / 0.96)',
+    'rgb(117 117 176 / 0.96)',
+    'rgb(210 181 147 / 0.96)',
+    'rgb(191 162 131 / 0.96)'
+  ),
+  dusk: createPanelGradient(
+    'rgb(85 101 145 / 0.96)',
+    'rgb(104 121 150 / 0.96)',
+    'rgb(169 149 126 / 0.96)',
+    'rgb(150 132 112 / 0.96)'
+  )
+};
 
 @Component({
   selector: 'app-frog-column',
@@ -79,9 +136,25 @@ export class FrogColumnComponent implements OnDestroy {
   protected readonly groundSeasonClass = computed(() =>
     this.getGroundSeasonClass(this.now().getMonth())
   );
-  protected readonly isDaytime = computed(() =>
-    this.isInDaytimeWindowByMinutes(this.getMinutesSinceMidnight(this.now()))
+  protected readonly sunTimes = computed(() =>
+    SunCalc.getTimes(this.now(), FROG_LATITUDE, FROG_LONGITUDE)
   );
+  protected readonly skyPhase = computed(() => resolveSkyPhase(this.now(), this.sunTimes()));
+  protected readonly panelGradient = computed(() => PANEL_GRADIENTS_BY_PHASE[this.skyPhase()]);
+  protected readonly backgroundTransitionMs = BACKGROUND_TRANSITION_MS;
+  protected readonly sunPosition = computed<CelestialPosition>(() => {
+    const sun = SunCalc.getPosition(this.now(), FROG_LATITUDE, FROG_LONGITUDE);
+    return toCelestialPosition(sun.azimuth, sun.altitude);
+  });
+  protected readonly moonPosition = computed<CelestialPosition>(() => {
+    const moon = SunCalc.getMoonPosition(this.now(), FROG_LATITUDE, FROG_LONGITUDE);
+    return toCelestialPosition(moon.azimuth, moon.altitude);
+  });
+  protected readonly moonBackgroundPosition = computed(() => {
+    const moonIllumination = SunCalc.getMoonIllumination(this.now());
+    const frameIndex = moonPhaseToFrameIndex(moonIllumination.phase);
+    return frameIndexToBackgroundPosition(frameIndex);
+  });
   protected readonly obstacleTravelMs = OBSTACLE_TRAVEL_MS;
 
   private readonly platformId = inject(PLATFORM_ID);
@@ -401,14 +474,6 @@ export class FrogColumnComponent implements OnDestroy {
     }
   }
 
-  private isInDaytimeWindowByMinutes(minutes: number): boolean {
-    return minutes >= DAYTIME_START_MINUTES && minutes < DAYTIME_END_MINUTES;
-  }
-
-  private getMinutesSinceMidnight(date: Date): number {
-    return date.getHours() * 60 + date.getMinutes();
-  }
-
   private getFlowerSeasonClass(monthIndex: number): FlowerSeasonClass {
     if (monthIndex >= 10 || monthIndex <= 1) {
       return 'frog-flower-winter';
@@ -440,4 +505,13 @@ export class FrogColumnComponent implements OnDestroy {
 
     return 'frog-ground-autumn';
   }
+}
+
+function createPanelGradient(
+  skyTop: string,
+  skyBottom: string,
+  groundTop: string,
+  groundBottom: string
+): string {
+  return `linear-gradient(180deg, ${skyTop} 0%, ${skyBottom} ${SKY_GROUND_SPLIT_PERCENT}%, ${groundTop} ${SKY_GROUND_SPLIT_PERCENT}%, ${groundBottom} 100%)`;
 }

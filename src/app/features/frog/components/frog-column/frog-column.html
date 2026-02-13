@@ -1,5 +1,10 @@
 <aside [attr.aria-labelledby]="titleId">
-  <div class="frog-panel" [class.game-mode]="isGameMode()">
+  <div
+    class="frog-panel"
+    [class.game-mode]="isGameMode()"
+    [style.background-image]="panelGradient()"
+    [style.--frog-panel-bg-transition-ms]="backgroundTransitionMs + 'ms'"
+  >
     @if (isGameMode()) {
       <button
         type="button"
@@ -24,26 +29,25 @@
             aria-hidden="true"
           />
         }
-        <div class="frog-celestial" aria-hidden="true">
-          @if (isDaytime()) {
-            <img
-              class="frog-celestial-image frog-celestial-image-sun"
-              ngSrc="/frog/sun.png"
-              width="360"
-              height="360"
-              alt=""
-              aria-hidden="true"
-            />
-          } @else {
-            <img
-              class="frog-celestial-image frog-celestial-image-moon"
-              ngSrc="/frog/moon.png"
-              width="500"
-              height="500"
-              alt=""
-              aria-hidden="true"
-            />
-          }
+        <div class="frog-celestial-layer" aria-hidden="true">
+          <img
+            class="frog-celestial-body frog-celestial-sun"
+            [class.frog-celestial-hidden]="!sunPosition().isVisible"
+            [style.left.%]="sunPosition().leftPct"
+            [style.top.%]="sunPosition().topPct"
+            ngSrc="/frog/sun.png"
+            width="360"
+            height="360"
+            alt=""
+            aria-hidden="true"
+          />
+          <span
+            class="frog-celestial-body frog-celestial-moon-phase"
+            [class.frog-celestial-hidden]="!moonPosition().isVisible"
+            [style.left.%]="moonPosition().leftPct"
+            [style.top.%]="moonPosition().topPct"
+            [style.background-position]="moonBackgroundPosition()"
+          ></span>
         </div>
         <div [class]="'frog-flower ' + flowerSeasonClass()" aria-hidden="true"></div>
         <div [class]="'frog-ground ' + groundSeasonClass()" aria-hidden="true"></div>

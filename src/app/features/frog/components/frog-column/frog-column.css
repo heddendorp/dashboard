@@ -16,13 +16,15 @@ aside {
   border: 1px solid var(--panel-stroke);
   height: 100%;
   min-height: 0;
-  background: linear-gradient(
+  background-color: rgb(210 232 248 / 0.95);
+  background-image: linear-gradient(
     180deg,
     rgb(222 240 252 / 0.95) 0%,
     rgb(210 232 248 / 0.95) 58.5%,
     rgb(220 205 173 / 0.95) 58.5%,
     rgb(206 189 156 / 0.95) 100%
   );
+  transition: background-image var(--frog-panel-bg-transition-ms, 120000ms) linear;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -70,10 +72,6 @@ aside {
   --grass-a: #7fbb58;
   --grass-b: #6cad4a;
   --grass-c: #8ec764;
-  --grass-top: #91cb65;
-  --grass-bottom: #5f9441;
-  --grass-border: rgb(39 87 47 / 0.45);
-  --grass-shine: rgb(191 236 146 / 0.45);
   position: absolute;
   left: 0;
   right: 0;
@@ -97,40 +95,24 @@ aside {
   --grass-a: #7da06f;
   --grass-b: #709060;
   --grass-c: #8cad80;
-  --grass-top: #93b685;
-  --grass-bottom: #66835a;
-  --grass-border: rgb(64 92 58 / 0.45);
-  --grass-shine: rgb(206 226 196 / 0.35);
 }
 
 .frog-ground-spring {
   --grass-a: #9bd66b;
   --grass-b: #8ccc5e;
   --grass-c: #a9df78;
-  --grass-top: #b5e684;
-  --grass-bottom: #72b34f;
-  --grass-border: rgb(64 120 54 / 0.45);
-  --grass-shine: rgb(222 248 183 / 0.45);
 }
 
 .frog-ground-summer {
   --grass-a: #5fae45;
   --grass-b: #4f9938;
   --grass-c: #6dbb51;
-  --grass-top: #78c45a;
-  --grass-bottom: #3f7f2d;
-  --grass-border: rgb(33 78 32 / 0.5);
-  --grass-shine: rgb(166 220 120 / 0.38);
 }
 
 .frog-ground-autumn {
   --grass-a: #7f9b4f;
   --grass-b: #6f8745;
   --grass-c: #8ca95b;
-  --grass-top: #98ae68;
-  --grass-bottom: #6b7242;
-  --grass-border: rgb(81 77 45 / 0.45);
-  --grass-shine: rgb(206 200 146 / 0.35);
 }
 
 .frog-food {
@@ -144,27 +126,43 @@ aside {
   pointer-events: none;
 }
 
-.frog-celestial {
+.frog-celestial-layer {
   position: absolute;
-  right: 1.2rem;
-  top: 0.75rem;
-  width: 2.6rem;
-  height: 2.6rem;
+  inset: 0;
+  overflow: hidden;
   pointer-events: none;
   z-index: 1;
 }
 
-.frog-celestial-image {
-  width: 100%;
-  height: 100%;
+.frog-celestial-body {
+  position: absolute;
+  width: 2.6rem;
+  height: 2.6rem;
+  transform: translate(-50%, -50%) scale(2.0834);
+  transform-origin: center;
+  transition:
+    left 60s linear,
+    top 60s linear,
+    opacity 250ms ease;
+  opacity: 1;
+  will-change: left, top, opacity;
+}
+
+.frog-celestial-sun {
   image-rendering: pixelated;
   object-fit: contain;
 }
 
-.frog-celestial-image-sun,
-.frog-celestial-image-moon {
-  transform: scale(2.0834);
-  transform-origin: center;
+.frog-celestial-moon-phase {
+  display: block;
+  image-rendering: pixelated;
+  background-image: url('/frog/moon-phases.png');
+  background-size: 400% 200%;
+  background-repeat: no-repeat;
+}
+
+.frog-celestial-hidden {
+  opacity: 0;
 }
 
 .frog-flower {

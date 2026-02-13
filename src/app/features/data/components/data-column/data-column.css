@@ -34,7 +34,7 @@
 }
 
 .widget-card-interactive:focus-visible {
-  outline: 2px solid #1d4ed8;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -97,7 +97,7 @@ p {
 }
 
 .calendar-event-item {
-  border-bottom: 1px solid rgb(83 96 130 / 0.16);
+  border-bottom: 1px solid var(--line-subtle);
   padding: 0 0 0.5rem;
 }
 
@@ -127,7 +127,7 @@ p {
 }
 
 .error-text {
-  color: #9b1c1c;
+  color: var(--danger-ink);
 }
 
 .retry-button {
@@ -135,14 +135,14 @@ p {
   border: 1px solid var(--panel-stroke);
   border-radius: 0.5rem;
   padding: 0.35rem 0.6rem;
-  background: rgb(255 255 255 / 0.7);
+  background: var(--control-bg-muted);
   color: var(--ink-strong);
   font: inherit;
   cursor: pointer;
 }
 
 .retry-button:focus-visible {
-  outline: 2px solid #1d4ed8;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -191,7 +191,7 @@ p {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgb(83 96 130 / 0.18);
+  background: var(--avatar-bg);
   color: var(--ink-strong);
   font-size: 1rem;
   font-weight: 700;
@@ -249,27 +249,27 @@ p {
   font-weight: 700;
   line-height: 1.2;
   white-space: nowrap;
-  background: rgb(35 90 200 / 0.16);
-  color: rgb(16 50 120);
+  background: var(--chip-info-bg);
+  color: var(--chip-info-ink);
 }
 
 .spots-open {
-  background: rgb(11 107 42 / 0.14);
-  color: #0b6b2a;
+  background: var(--chip-success-bg);
+  color: var(--chip-success-ink);
 }
 
 .spots-low {
-  background: rgb(139 94 0 / 0.14);
-  color: #8b5e00;
+  background: var(--chip-warning-bg);
+  color: var(--chip-warning-ink);
 }
 
 .spots-full {
-  background: rgb(155 28 28 / 0.14);
-  color: #9b1c1c;
+  background: var(--chip-danger-bg);
+  color: var(--chip-danger-ink);
 }
 
 .spots-unknown {
-  background: rgb(83 96 130 / 0.14);
+  background: var(--chip-muted-bg);
   color: var(--ink-muted);
 }
 
@@ -283,13 +283,13 @@ p {
 }
 
 .calendar-conflict-chip-during {
-  background: rgb(155 28 28 / 0.16);
-  color: #8b1a1a;
+  background: var(--chip-danger-strong-bg);
+  color: var(--chip-danger-strong-ink);
 }
 
 .calendar-conflict-chip-near {
-  background: rgb(139 94 0 / 0.16);
-  color: #7a5200;
+  background: var(--chip-warning-strong-bg);
+  color: var(--chip-warning-strong-ink);
 }
 
 .status-card ul {
@@ -304,7 +304,7 @@ p {
   display: flex;
   justify-content: space-between;
   gap: 0.8rem;
-  border-bottom: 1px solid rgb(83 96 130 / 0.16);
+  border-bottom: 1px solid var(--line-subtle);
   padding-bottom: 0.4rem;
 }
 
@@ -313,15 +313,15 @@ p {
 }
 
 .status-ready {
-  color: #0b6b2a;
+  color: var(--chip-success-ink);
 }
 
 .status-pending {
-  color: #8b5e00;
+  color: var(--chip-warning-ink);
 }
 
 .status-degraded {
-  color: #9b1c1c;
+  color: var(--chip-danger-ink);
 }
 
 @media (max-width: 1050px) {

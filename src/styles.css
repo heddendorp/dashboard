@@ -7,7 +7,32 @@
   --accent-ink: rgb(154 74 0);
   --panel-bg: rgb(255 255 255 / 0.9);
   --panel-tint: rgb(255 240 222 / 0.82);
+  --panel-highlight: rgb(255 255 255 / 0.92);
   --panel-stroke: rgb(66 84 123 / 0.24);
+  --line-subtle: rgb(83 96 130 / 0.16);
+  --focus-ring: #1d4ed8;
+  --control-bg: rgb(255 255 255 / 0.82);
+  --control-bg-soft: rgb(255 255 255 / 0.72);
+  --control-bg-muted: rgb(255 255 255 / 0.7);
+  --avatar-bg: rgb(83 96 130 / 0.18);
+  --danger-ink: #9b1c1c;
+  --chip-info-bg: rgb(35 90 200 / 0.16);
+  --chip-info-ink: rgb(16 50 120);
+  --chip-success-bg: rgb(11 107 42 / 0.14);
+  --chip-success-ink: #0b6b2a;
+  --chip-warning-bg: rgb(139 94 0 / 0.14);
+  --chip-warning-ink: #8b5e00;
+  --chip-danger-bg: rgb(155 28 28 / 0.14);
+  --chip-danger-ink: #9b1c1c;
+  --chip-danger-strong-bg: rgb(155 28 28 / 0.16);
+  --chip-danger-strong-ink: #8b1a1a;
+  --chip-warning-strong-bg: rgb(139 94 0 / 0.16);
+  --chip-warning-strong-ink: #7a5200;
+  --chip-muted-bg: rgb(83 96 130 / 0.14);
+  --body-glow-a: rgb(255 238 211 / 0.9);
+  --body-glow-b: rgb(214 243 255 / 0.9);
+  --body-grad-top: rgb(247 250 255);
+  --body-grad-bottom: rgb(236 242 253);
 }
 
 * {
@@ -19,6 +44,7 @@ body {
   height: 100%;
   min-height: 100%;
   min-height: 100dvh;
+  color-scheme: light dark;
 }
 
 app-root {
@@ -33,9 +59,46 @@ body {
   font-family: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
   color: var(--ink);
   background:
-    radial-gradient(circle at 0% 0%, rgb(255 238 211 / 0.9), transparent 35%),
-    radial-gradient(circle at 100% 100%, rgb(214 243 255 / 0.9), transparent 45%),
-    linear-gradient(180deg, rgb(247 250 255), rgb(236 242 253));
+    radial-gradient(circle at 0% 0%, var(--body-glow-a), transparent 35%),
+    radial-gradient(circle at 100% 100%, var(--body-glow-b), transparent 45%),
+    linear-gradient(180deg, var(--body-grad-top), var(--body-grad-bottom));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink-strong: rgb(232 241 255);
+    --ink: rgb(196 213 238);
+    --ink-muted: rgb(150 174 207);
+    --accent-ink: rgb(255 187 96);
+    --panel-bg: rgb(21 31 47 / 0.86);
+    --panel-tint: rgb(49 60 84 / 0.84);
+    --panel-highlight: rgb(20 29 45 / 0.92);
+    --panel-stroke: rgb(136 164 204 / 0.34);
+    --line-subtle: rgb(121 145 186 / 0.28);
+    --focus-ring: #7cb3ff;
+    --control-bg: rgb(35 47 68 / 0.9);
+    --control-bg-soft: rgb(36 50 73 / 0.86);
+    --control-bg-muted: rgb(38 52 75 / 0.8);
+    --avatar-bg: rgb(124 153 199 / 0.26);
+    --danger-ink: #ff8b8b;
+    --chip-info-bg: rgb(104 154 255 / 0.3);
+    --chip-info-ink: rgb(215 229 255);
+    --chip-success-bg: rgb(75 190 121 / 0.26);
+    --chip-success-ink: rgb(191 255 218);
+    --chip-warning-bg: rgb(230 178 86 / 0.26);
+    --chip-warning-ink: rgb(255 234 186);
+    --chip-danger-bg: rgb(235 113 113 / 0.26);
+    --chip-danger-ink: rgb(255 210 210);
+    --chip-danger-strong-bg: rgb(235 113 113 / 0.34);
+    --chip-danger-strong-ink: rgb(255 218 218);
+    --chip-warning-strong-bg: rgb(230 178 86 / 0.34);
+    --chip-warning-strong-ink: rgb(255 238 198);
+    --chip-muted-bg: rgb(132 154 193 / 0.22);
+    --body-glow-a: rgb(77 90 126 / 0.42);
+    --body-glow-b: rgb(43 73 126 / 0.35);
+    --body-grad-top: rgb(14 22 37);
+    --body-grad-bottom: rgb(10 17 30);
+  }
 }
 
 ::view-transition-old(calendar-tile),

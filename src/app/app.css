@@ -22,7 +22,7 @@
   gap: 1rem;
   border: 1px solid var(--panel-stroke);
   border-radius: 1rem;
-  background: linear-gradient(135deg, var(--panel-tint), rgb(255 255 255 / 92%));
+  background: linear-gradient(135deg, var(--panel-tint), var(--panel-highlight));
   padding: 1rem 1.25rem;
   align-items: flex-start;
 }

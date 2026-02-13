@@ -39,7 +39,7 @@
 .retry-button {
   border: 1px solid var(--panel-stroke);
   border-radius: 0.6rem;
-  background: rgb(255 255 255 / 0.82);
+  background: var(--control-bg);
   color: var(--ink-strong);
   padding: 0.35rem 0.75rem;
   font: inherit;
@@ -48,7 +48,7 @@
 
 .detail-back-button:focus-visible,
 .retry-button:focus-visible {
-  outline: 2px solid #1d4ed8;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -77,7 +77,7 @@ h2 {
 }
 
 .error-text {
-  color: #9b1c1c;
+  color: var(--danger-ink);
 }
 
 .groups-shell {
@@ -104,7 +104,7 @@ h2 {
 }
 
 .event-item {
-  border-bottom: 1px solid rgb(83 96 130 / 0.16);
+  border-bottom: 1px solid var(--line-subtle);
   padding-bottom: 0.45rem;
 }
 

@@ -233,65 +233,6 @@ p {
   max-width: 20rem;
 }
 
-.spot-chip {
-  border-radius: 999px;
-  padding: 0.2rem 0.62rem;
-  font-size: 0.85rem;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.booked-chip {
-  border-radius: 999px;
-  padding: 0.2rem 0.62rem;
-  font-size: 0.82rem;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-  background: var(--chip-info-bg);
-  color: var(--chip-info-ink);
-}
-
-.spots-open {
-  background: var(--chip-success-bg);
-  color: var(--chip-success-ink);
-}
-
-.spots-low {
-  background: var(--chip-warning-bg);
-  color: var(--chip-warning-ink);
-}
-
-.spots-full {
-  background: var(--chip-danger-bg);
-  color: var(--chip-danger-ink);
-}
-
-.spots-unknown {
-  background: var(--chip-muted-bg);
-  color: var(--ink-muted);
-}
-
-.calendar-conflict-chip {
-  border-radius: 999px;
-  padding: 0.2rem 0.62rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.calendar-conflict-chip-during {
-  background: var(--chip-danger-strong-bg);
-  color: var(--chip-danger-strong-ink);
-}
-
-.calendar-conflict-chip-near {
-  background: var(--chip-warning-strong-bg);
-  color: var(--chip-warning-strong-ink);
-}
-
 .status-card ul {
   margin: 0.75rem 0 0;
   padding: 0;

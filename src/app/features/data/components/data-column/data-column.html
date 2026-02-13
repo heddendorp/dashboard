@@ -94,17 +94,17 @@
                   <div class="session-head">
                     <p class="session-title">{{ session.title }}</p>
                     @if (session.isBooked) {
-                      <span class="booked-chip">Planned</span>
+                      <app-badge tone="blue">Planned</app-badge>
                     }
-                    <span [class]="session.openSpotsClass">{{ session.openSpotsLabel }}</span>
-                    @if (session.calendarConflictLabel && session.calendarConflictClass) {
-                      <span
-                        [class]="session.calendarConflictClass"
+                    <app-badge [tone]="session.openSpotsTone">{{ session.openSpotsLabel }}</app-badge>
+                    @if (session.calendarConflictLabel && session.calendarConflictTone) {
+                      <app-badge
+                        [tone]="session.calendarConflictTone"
                         [attr.title]="session.calendarConflictHint"
                         [attr.aria-label]="session.calendarConflictHint"
                       >
                         {{ session.calendarConflictLabel }}
-                      </span>
+                      </app-badge>
                     }
                   </div>
                   <p class="session-detail">

@@ -68,17 +68,17 @@
               <div class="session-title-row">
                 <p class="session-title">{{ workout.title }}</p>
                 @if (workout.isBooked) {
-                  <span class="booked-chip">Planned</span>
+                  <app-badge tone="blue">Planned</app-badge>
                 }
-                <span [class]="workout.openSpotsClass">{{ workout.openSpotsLabel }}</span>
-                @if (workout.calendarConflictLabel && workout.calendarConflictClass) {
-                  <span
-                    [class]="workout.calendarConflictClass"
+                <app-badge [tone]="workout.openSpotsTone">{{ workout.openSpotsLabel }}</app-badge>
+                @if (workout.calendarConflictLabel && workout.calendarConflictTone) {
+                  <app-badge
+                    [tone]="workout.calendarConflictTone"
                     [attr.title]="workout.calendarConflictHint"
                     [attr.aria-label]="workout.calendarConflictHint"
                   >
                     {{ workout.calendarConflictLabel }}
-                  </span>
+                  </app-badge>
                 }
               </div>
               <p class="session-detail">{{ workout.startsAtLabel }} · {{ workout.location }}</p>

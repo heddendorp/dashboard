@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { BadgeComponent, BadgeTone } from '../../../../core/components/badge/badge';
 import type {
   DataBeat81Event,
   DataCalendarEvent,
@@ -28,9 +29,9 @@ interface Beat81SessionRow {
   trainerImageUrl: string | null;
   trainerInitials: string;
   openSpotsLabel: string;
-  openSpotsClass: string;
+  openSpotsTone: BadgeTone;
   calendarConflictLabel: string | null;
-  calendarConflictClass: string | null;
+  calendarConflictTone: BadgeTone | null;
   calendarConflictHint: string | null;
 }
 
@@ -46,7 +47,7 @@ let dataColumnInstanceCounter = 0;
 
 @Component({
   selector: 'app-data-column',
-  imports: [DatePipe],
+  imports: [DatePipe, BadgeComponent],
   templateUrl: './data-column.html',
   styleUrl: './data-column.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -219,12 +220,12 @@ export class DataColumnComponent {
       trainerImageUrl: event.trainerImageUrl,
       trainerInitials: this.toInitials(trainerName),
       openSpotsLabel: spots.label,
-      openSpotsClass: spots.className,
+      openSpotsTone: spots.tone,
       calendarConflictLabel,
-      calendarConflictClass: calendarConflict
+      calendarConflictTone: calendarConflict
         ? calendarConflict.kind === 'during'
-          ? 'calendar-conflict-chip calendar-conflict-chip-during'
-          : 'calendar-conflict-chip calendar-conflict-chip-near'
+          ? 'red'
+          : 'yellow'
         : null,
       calendarConflictHint: calendarConflict
         ? `${calendarConflictLabel}: ${calendarConflict.eventTitle}`
@@ -242,20 +243,20 @@ export class DataColumnComponent {
     };
   }
 
-  private toOpenSpotsIndicator(openSpots: number | null): { label: string; className: string } {
+  private toOpenSpotsIndicator(openSpots: number | null): { label: string; tone: BadgeTone } {
     if (openSpots === null) {
-      return { label: 'Spots ?', className: 'spot-chip spots-unknown' };
+      return { label: 'Spots ?', tone: 'gray' };
     }
 
     if (openSpots <= 0) {
-      return { label: 'Full', className: 'spot-chip spots-full' };
+      return { label: 'Full', tone: 'red' };
     }
 
     if (openSpots === 1) {
-      return { label: '1 left', className: 'spot-chip spots-low' };
+      return { label: '1 left', tone: 'yellow' };
     }
 
-    return { label: `${openSpots} left`, className: 'spot-chip spots-open' };
+    return { label: `${openSpots} left`, tone: 'green' };
   }
 
   private startAutoRefresh(): void {

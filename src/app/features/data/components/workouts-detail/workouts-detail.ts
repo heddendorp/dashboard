@@ -11,6 +11,7 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 
+import { BadgeComponent, BadgeTone } from '../../../../core/components/badge/badge';
 import type { DataBeat81Event } from '../../models/data-dashboard.models';
 import { DataDashboardService } from '../../services/data-dashboard.service';
 import { isBerlinAtOrAfter, isBerlinWorkday } from '../../utils/berlin-workout-filter';
@@ -29,15 +30,16 @@ interface WorkoutRow {
   trainerImageUrl: string | null;
   trainerInitials: string;
   openSpotsLabel: string;
-  openSpotsClass: string;
+  openSpotsTone: BadgeTone;
   capacityLabel: string;
   calendarConflictLabel: string | null;
-  calendarConflictClass: string | null;
+  calendarConflictTone: BadgeTone | null;
   calendarConflictHint: string | null;
 }
 
 @Component({
   selector: 'app-workouts-detail',
+  imports: [BadgeComponent],
   templateUrl: './workouts-detail.html',
   styleUrl: './workouts-detail.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -179,13 +181,13 @@ export class WorkoutsDetailComponent {
       trainerImageUrl: event.trainerImageUrl,
       trainerInitials: this.toInitials(trainerName),
       openSpotsLabel: spots.label,
-      openSpotsClass: spots.className,
+      openSpotsTone: spots.tone,
       capacityLabel: this.toCapacityLabel(event),
       calendarConflictLabel,
-      calendarConflictClass: calendarConflict
+      calendarConflictTone: calendarConflict
         ? calendarConflict.kind === 'during'
-          ? 'calendar-conflict-chip calendar-conflict-chip-during'
-          : 'calendar-conflict-chip calendar-conflict-chip-near'
+          ? 'red'
+          : 'yellow'
         : null,
       calendarConflictHint: calendarConflict
         ? `${calendarConflictLabel}: ${calendarConflict.eventTitle}`
@@ -201,20 +203,20 @@ export class WorkoutsDetailComponent {
     return `${event.currentParticipants}/${event.maxParticipants} booked`;
   }
 
-  private toOpenSpotsIndicator(openSpots: number | null): { label: string; className: string } {
+  private toOpenSpotsIndicator(openSpots: number | null): { label: string; tone: BadgeTone } {
     if (openSpots === null) {
-      return { label: 'Spots ?', className: 'spot-chip spots-unknown' };
+      return { label: 'Spots ?', tone: 'gray' };
     }
 
     if (openSpots <= 0) {
-      return { label: 'Full', className: 'spot-chip spots-full' };
+      return { label: 'Full', tone: 'red' };
     }
 
     if (openSpots === 1) {
-      return { label: '1 left', className: 'spot-chip spots-low' };
+      return { label: '1 left', tone: 'yellow' };
     }
 
-    return { label: `${openSpots} left`, className: 'spot-chip spots-open' };
+    return { label: `${openSpots} left`, tone: 'green' };
   }
 
   private compareWorkouts(left: DataBeat81Event, right: DataBeat81Event): number {
